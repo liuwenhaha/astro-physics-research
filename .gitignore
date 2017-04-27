@@ -1,3 +1,6 @@
-# Pycharm #
-###########
+# Pycharm
 .idea/*
+
+# Data
+assets/explosure_831555_w2m0m0/*
+*/.ipynb_checkpoints/*

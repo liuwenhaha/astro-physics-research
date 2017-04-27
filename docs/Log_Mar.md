@@ -6,6 +6,8 @@ https://www.tensorflow.org/install/install_linux
     CUDA Toolkit
     need to download https://developer.nvidia.com/cuda-downloads
         backup in hardware
+    CUDNN
+        https://askubuntu.com/questions/767269/how-can-i-install-cudnn-on-ubuntu-16-04
 
 3/13/2017
 GET STARTED
@@ -56,6 +58,13 @@ Softmax Regressions
     To do efficient numerical computing in Python, we typically use libraries like NumPy that do expensive operations such as matrix multiplication outside Python, using highly efficient code implemented in another language. Unfortunately, there can still be a lot of overhead from switching back to Python every operation. This overhead is especially bad if you want to run computations on GPUs or in a distributed manner, where there can be a high cost to transferring data.
     TensorFlow also does its heavy lifting outside Python, but it takes things a step further to avoid this overhead. Instead of running a single expensive operation independently from Python, TensorFlow lets us describe a graph of interacting operations that run entirely outside Python. This approach is similar to that used in Theano or Torch.
     The role of the Python code is therefore to build this external computation graph, and to dictate which parts of the computation graph should be run.
+Multilayer Convolutional Network
+    Initialize with noise for symmetry breaking and prevent 0 gradient
+    ReLU -> small positive for avoiding "dead neurons"
+    For this small convolutional network, performance is actually nearly identical with and without dropout. Dropout is often very effective at reducing overfitting, but it is most useful when training very large neural networks.
+
+
+
 
 
 
@@ -63,6 +72,21 @@ Softmax Regressions
 
 
 4. TensorFlow Mechanics 101
+Goal is to use TensorFlow to train and evaluate a simple feed-forward neural network for MNIST.
+Tutorial Files
+Prepare the Data
+Build the Graph
+    Inference
+    Loss
+    Training
+Train the Model
+    The Graph
+    The Session
+    Train Loop
+Evaluate the Model
+    Build the Eval Graph
+    Eval Output
+
 
 5. tf.contrib.learn Quickstart
 

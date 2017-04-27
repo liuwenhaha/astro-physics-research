@@ -15,3 +15,9 @@ field_processing
 read_info
 measure_shear
 merge_explosures
+
+
+
+TensorFlow:
+GPU usage check: nvidia-smi
+CPU usage check: top

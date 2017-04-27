@@ -1,5 +1,5 @@
 # read star PSF from .fits file
-
+import time
 from astropy.io import fits
 import numpy as np
 import math
@@ -47,9 +47,15 @@ def get_ellipticity(PSF):
 
 
 def plot_ellipticities(coord, ellip):
+    plt.figure(figsize=(4.2, 9.4), dpi=80)
+    plt.xlim(0, 2100)
+    plt.ylim(0, 4700)
+    plt.xticks(np.arange(0, 2100, 500))
+    plt.yticks(np.arange(0, 4700, 500))
+    plt.axes().set_aspect('equal', 'datalim')
     num = len(coord)
     ellip_vector = [np.array([[coord[n][0] + 15 * ellip[n][0], coord[n][1] + 15 * ellip[n][1]],
-                              [coord[n][0] - 15 * ellip[n][0], coord[n][1] - 15 * ellip[n][1]]])
+                            [coord[n][0] - 15 * ellip[n][0], coord[n][1] - 15 * ellip[n][1]]])
                     for n in range(num)]
     for i in range(num):
         vertices = ellip_vector[i]
@@ -71,8 +77,11 @@ if __name__ == '__main__':
     # y 0 - 4606
     star_power = fits.open(image_file)
     star_power_data = star_power[0].data
-    ellipticities = [
-        get_ellipticity(star_power_data[((i / 15) * 48):((i / 15 + 1) * 48), ((i % 15) * 48):((i % 15 + 1) * 48)])
-        for i in range(star_number)]
+    t0 = time.time()
+    ellipticities = [get_ellipticity(star_power_data[(i // 15) * 48:(i // 15 + 1) * 48,
+                                     (i % 15) * 48:(i % 15 + 1) * 48])
+                     for i in range(star_number)]
+    t1 = time.time()
+    print("time{}".format(t1-t0))
     plot_ellipticities(labels, ellipticities)
-    print ellipticities
+    # print(ellipticities)
