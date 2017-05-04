@@ -25,7 +25,7 @@ import sys
 import time
 
 from six.moves import xrange  # pylint: disable=redefined-builtin
-import tensorflow as tf
+import tensorflow_tutorial as tf
 
 from tensorflow.examples.tutorials.mnist import input_data
 from tensorflow.examples.tutorials.mnist import mnist
@@ -250,13 +250,13 @@ if __name__ == '__main__':
   parser.add_argument(
       '--input_data_dir',
       type=str,
-      default='/tmp/tensorflow/mnist/input_data',
+      default='/tmp/tensorflow_tutorial/mnist/input_data',
       help='Directory to put the input data.'
   )
   parser.add_argument(
       '--log_dir',
       type=str,
-      default='/tmp/tensorflow/mnist/logs/fully_connected_feed',
+      default='/tmp/tensorflow_tutorial/mnist/logs/fully_connected_feed',
       help='Directory to put the log data.'
   )
   parser.add_argument(

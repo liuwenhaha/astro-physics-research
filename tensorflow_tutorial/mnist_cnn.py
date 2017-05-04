@@ -1,5 +1,5 @@
-import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
+import tensorflow_tutorial as tf
+from tensorflow_tutorial.examples.tutorials.mnist import input_data
 
 
 def weight_variable(shape):

@@ -37,7 +37,7 @@ print("W: %s b: %s loss: %s"%(curr_W, curr_b, curr_loss))
 
 #
 # Example 2
-# import tensorflow as tf
+# import tensorflow_tutorial as tf
 # # NumPy is often used to load, manipulate and preprocess data.
 # import numpy as np
 #
