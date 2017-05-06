@@ -26,7 +26,7 @@ def inference(coords, hidden1_units):
                                                   stddev=1.0/math.sqrt(float(hidden1_units))), name='weights')
         biases = tf.Variable(tf.zeros([2034]), name='biases')
         # TODO: Try linear and relu
-        psf_value = tf.nn.relu(tf.matmul(hidden1, weights) + biases)
+        psf_value = tf.matmul(hidden1, weights) + biases
     return psf_value
 
 

@@ -1,6 +1,6 @@
 '''
 Read PSF .fits file
-Apply basic linear interpolation
+Apply 1st polynomial, tf_psfwise,  interpolation
 Plot coefficient matrix
 -------------------------------------
 Divide input PSF to two branch: interpolate/validate
@@ -15,6 +15,8 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import pickle
 import random
 import time
+import tf_psfwise_interpolation
+
 
 # Some constants
 image_file = 'assets/star_power831555_01.fits'
@@ -162,7 +164,16 @@ class PSF_interpolation:
     #               'chip_train_data': <view_of_chip_data>,
     #               'chip_validate_data': <view_of_chip_data>,},
     #              ...]
-    # cal_info -> {'expo_ellip_range': (<min_ellip>, <max_ellip>)}
+    # plot info cache to file tag_part
+    #     ellip_vector: data to draw ellip dist. bar
+    #     coord: coord for each bar
+    #     color: magnitude of each ellip
+    # cal_info -> {'poly_1': {'a': <numpy_array_for_a>,
+    #                         'b': <numpy_array_for_b>, ...
+    #                         'predictions': [<numpy_array_psf>, ...]},
+    #              'tf_psfwise': {'model': <model for prediction>, ...
+    #                             'predictions': [<numpy_array_psf>, ...]},
+    #              ...}
     # train_data_ratio -> partition of train data
 
     psf_data = []
@@ -186,44 +197,44 @@ class PSF_interpolation:
                      'chip_validate_data': <view_of_chip_data>,},
                     ...]
         '''
-        self.exp_num = exp_num
         self.region = region
-        for i in range(1, 37):
-            fits_file_path = 'assets/explosure_{0}_{1}/star_power{0}_{2}.fits'.format(exp_num, region,
-                                                                                      '{0:02d}'.format(i))
-            info_file_path = 'assets/explosure_{0}_{1}/star_shape{0}_{2}.dat'.format(exp_num, region,
-                                                                                     '{0:02d}'.format(i))
-            chip_info = {'chip_no': i}
-            chip_data = []
-            with open(info_file_path, 'r') as info_file:
-                info_file.readline()
-                for line in info_file.readlines():
-                    raw_record = line.split()
-                    chip_data.append([float(raw_record[0]), float(raw_record[1]),
-                                      float(raw_record[2]), float(raw_record[3])])
-            with fits.open(fits_file_path) as fits_file:
-                psf_power_data = fits_file[0].data
-                # print(type(psf_power_data))
-                # exit()
-                for k in range(len(chip_data)):
-                    chip_data[k].append(psf_power_data[((k // 15) * 48):((k // 15 + 1) * 48),
-                                        ((k % 15) * 48):((k % 15 + 1) * 48)].copy())
-            random.shuffle(chip_data)
-            star_number = len(chip_data)
-            chip_info['chip_train_data'] = psf_power_data[:int(star_number * self.train_data_ratio)]
-            chip_info['chip_validate_data'] = psf_power_data[int(star_number * self.train_data_ratio):]
-            chip_info['chip_data'] = chip_data
-            self.psf_data.append(chip_info)
-
-    def explosure_ellipticity_range(self):
-        all_ellipticities = []
-        for i in range(36):
-            chip_data = self.psf_data[i]['chip_data']
-            star_number = len(chip_data)
-            all_ellipticities += [get_ellp(chip_data[k][4]) for k in range(star_number)]
-        self.cal_info['expo_ellip_range'] = (min(all_ellipticities), max(all_ellipticities))
-        print('Ellip range is {0} to {1}'.format(self.cal_info['expo_ellip_range'][0],
-                                                 self.cal_info['expo_ellip_range'][1]))
+        self.exp_num = exp_num
+        # Try to load psf data from cache
+        # This retains the train/validate data
+        try:
+            with open('assets/cache/{}_{}/psf_data.p'.format(self.region, self.exp_num),
+                      'rb') as pickle_file:
+                self.psf_data = pickle.load(pickle_file)
+        except FileNotFoundError:
+            for i in range(1, 37):
+                fits_file_path = 'assets/explosure_{0}_{1}/star_power{0}_{2}.fits'.format(exp_num, region,
+                                                                                          '{0:02d}'.format(i))
+                info_file_path = 'assets/explosure_{0}_{1}/star_shape{0}_{2}.dat'.format(exp_num, region,
+                                                                                         '{0:02d}'.format(i))
+                chip_info = {'chip_no': i}
+                chip_data = []
+                with open(info_file_path, 'r') as info_file:
+                    info_file.readline()
+                    for line in info_file.readlines():
+                        raw_record = line.split()
+                        chip_data.append([float(raw_record[0]), float(raw_record[1]),
+                                          float(raw_record[2]), float(raw_record[3])])
+                with fits.open(fits_file_path) as fits_file:
+                    psf_power_data = fits_file[0].data
+                    # print(type(psf_power_data))
+                    # exit()
+                    for k in range(len(chip_data)):
+                        chip_data[k].append(psf_power_data[((k // 15) * 48):((k // 15 + 1) * 48),
+                                            ((k % 15) * 48):((k % 15 + 1) * 48)].copy())
+                random.shuffle(chip_data)
+                star_number = len(chip_data)
+                chip_info['chip_train_data'] = psf_power_data[:int(star_number * self.train_data_ratio)]
+                chip_info['chip_validate_data'] = psf_power_data[int(star_number * self.train_data_ratio):]
+                chip_info['chip_data'] = chip_data
+                self.psf_data.append(chip_info)
+            # save psf data to cache
+            pickle.dump(self.psf_data, open('assets/cache/{}_{}/psf_data.p'.
+                                            format(self.region, self.exp_num), 'wb'))
 
     def plot_ellipticities(self, tag='exposure', part='all'):
         '''
@@ -240,7 +251,7 @@ class PSF_interpolation:
         if tag == 'exposure':
             # Try to load cached plot data
             try:
-                with open('assets/cache/{}_{}_{}_{}.p'.format(self.region, self.exp_num, tag, part_name),
+                with open('assets/cache/{}_{}/{}_{}.p'.format(self.region, self.exp_num, tag, part_name),
                           'rb') as pickle_file:
                     pickle_data = pickle.load(pickle_file)
                     ellip_vector = pickle_data['ellip_vector']
@@ -263,11 +274,11 @@ class PSF_interpolation:
 
                 # Cache plot data to file
                 pickle_data = {'coord': coord, 'ellip': ellip, 'color': color, 'ellip_vector': ellip_vector}
-                pickle.dump(pickle_data, open('assets/cache/{}_{}_{}_{}.p'.
+                pickle.dump(pickle_data, open('assets/cache/{}_{}/{}_{}.p'.
                                               format(self.region, self.exp_num, tag, part_name), 'wb'))
             # Pick out ellipticity less than a range
-            ellip_vector = ellip_vector[color < 0.15]
-            color = color[color < 0.15]
+            # ellip_vector = ellip_vector[color < 0.15]
+            # color = color[color < 0.15]
 
             star_num = len(ellip_vector)
             x_coord = [tcoord[0] for tcoord in coord]
@@ -337,28 +348,56 @@ class PSF_interpolation:
                 plt.plot(vertices[:, 0], vertices[:, 1], color=color, linewidth=chip_ellip_bar_wid)
             plt.show()
 
-    def linear_interpolation(self):
+    def poly_1_interpolation(self):
         '''
         apply linear interpolation
+        save matrix a, b, c to cal_info['poly_1']
         plot coefficient matrix a, b
+        with cache support
         :return:
         '''
-        # get train/validate set coordinates
-        train_coordinates = np.array([psf_data[:2] for psf_data in self.train_psf_data])
-        validate_coordinates = np.array([psf_data[:2] for psf_data in self.validate_psf_data])
-        # perform linear interpolation on train psf data
-        t_x = train_coordinates[:, 0]
-        t_y = train_coordinates[:, 1]
-        t_z = np.array([psf_data[2] for psf_data in self.train_psf_data])
-        coef_x_x = np.sum(t_x ** 2)
-        coef_y_y = np.sum(t_y ** 2)
-        coef_x_y = np.sum(t_x * t_y)
-        coef_z_x = np.sum(t_x * t_y)
+
+        # Try to load cached plot data
+        try:
+            with open('assets/cache/{}_{}/cal_info.p'.format(self.region, self.exp_num),
+                      'rb') as pickle_file:
+                self.cal_info = pickle.load(pickle_file)
+                if not ("poly_1" in self.cal_info):
+                    # TODO: repeat the algor. below
+                    pass
+        except FileNotFoundError:
+            # get train/validate set coordinates
+            train_coordinates = np.array([psf_data[:2] for psf_data in self.train_psf_data])
+            validate_coordinates = np.array([psf_data[:2] for psf_data in self.validate_psf_data])
+            # perform linear interpolation on train psf data
+            t_x = train_coordinates[:, 0]
+            t_y = train_coordinates[:, 1]
+            t_z = np.array([psf_data[2] for psf_data in self.train_psf_data])
+            coef_x_x = np.sum(t_x ** 2)
+            coef_y_y = np.sum(t_y ** 2)
+            coef_x_y = np.sum(t_x * t_y)
+            coef_z_x = np.sum(t_x * t_y)
+            # TODO: Finish poly 1 interpolation
+            self.cal_info['poly_1'] = []
+            # Cache plot data to file
+            pickle.dump(self.cal_info, open('assets/cache/{}_{}/cal_info.p'.
+                                          format(self.region, self.exp_num), 'wb'))
+            pass
+
+    def evaluate(self, methods):
+        '''
+        evaluate pixel-wise MSE over validate set for each methods
+        :return:
+        '''
+        if not methods:
+            methods = ['poly_1', 'tf_psfwise']
         pass
 
-    def linear_interpolation_show_residual(self):
+    def tf_psfwise_interpolation(self):
         '''
-        divide psf_stamps into interpolation/validation
+        train neural network define in tf_psfwise_interpolation.py
+        save the trained model to cal_info
+        with cache support
         :return:
         '''
         pass
