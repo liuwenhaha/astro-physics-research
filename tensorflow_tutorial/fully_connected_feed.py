@@ -25,7 +25,7 @@ import sys
 import time
 
 from six.moves import xrange  # pylint: disable=redefined-builtin
-import tensorflow_tutorial as tf
+import tensorflow as tf
 
 from tensorflow.examples.tutorials.mnist import input_data
 from tensorflow.examples.tutorials.mnist import mnist

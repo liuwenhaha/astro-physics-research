@@ -294,17 +294,31 @@ class PSF_interpolation:
         #               'chip_validate_data': <view_of_chip_data>,},
         #              ...]
 
-        # TODO: prepare dataset
-        train_coord = []
-        train_psf_labels = []
-        print(self.psf_data[0]['chip_train_data'])
-        for chip_psf_data in self.psf_data:
-            train_coord += [train_data[2:4] for train_data in chip_psf_data['chip_train_data']]
-            train_psf_labels += [train_data[4].ravel() for train_data in chip_psf_data['chip_train_data']]
-        train_coord = np.array(train_coord)
-        train_psf_labels = np.array(train_psf_labels)
-        data_set = tf_psfwise.DataSet(train_coord, train_psf_labels)
-        
+        # TODO: prepare datasets
+        data_sets = {}
+        for tag in ('train', 'validate'):
+            coord = []
+            psf_labels = []
+            chip_data_name = 'chip_{}_data'.format(tag)
+            for chip_psf_data in self.psf_data:
+                coord += [data[2:4] for data in chip_psf_data[chip_data_name]]
+                psf_labels += [data[4].ravel() for data in chip_psf_data[chip_data_name]]
+            coord = np.array(coord)
+            psf_labels = np.array(psf_labels)
+            data_sets[tag] = tf_psfwise.DataSet(coord, psf_labels)
+        learning_rate = 0.01
+        max_steps = 200000
+        # hidden unit for pixel: 3-12
+        # hidden unit for psf: 91-100
+        hidden1 = 128
+        hidden2 = 32
+        batch_size = 100
+        tf_psfwise.execute(learning_rate=learning_rate, max_steps=max_steps, hidden1=hidden1,
+                           hidden2=hidden2, batch_size=batch_size,
+                           log_dir='assets/log/{}_{}/lr{}_ms{}_h1.{}_h2.{}_bs{}'.format(self.region, self.exp_num,
+                                                                                        learning_rate, max_steps,
+                                                                                        hidden1, hidden2, batch_size),
+                           datasets=data_sets)
         pass
 
     def plot_stamp(self, stamp_data, plot_axes_extend=(0, 48, 0, 48)):
