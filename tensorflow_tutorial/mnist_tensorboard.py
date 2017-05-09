@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 import os
-import tensorflow_tutorial as tf
+import tensorflow as tf
 import urllib
 from urllib import request
 
