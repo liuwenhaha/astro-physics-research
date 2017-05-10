@@ -26,3 +26,25 @@ Idea:
         a way to evaluate interpolation over number of density is to use the train to validate set
         first use train_data_ratio = 0.5
         rename sub-directory under cache to include train_data_ratio later
+
+5/10/2017
+TODO:
+    implement linear interpolation
+        calculate the mse
+    check if better loss can be found(divide by original psf)
+    visualize hidden1 hidden2
+    hidden1 36 hidden2 144
+    use trained model to make predictions
+
+Results:
+    learning rate
+        0.1/1/10 seems that bigger the better
+    poly-1 result
+        Train Data Eval:
+          Num examples: 2057  Total loss: 0.000047646  Mean loss @ 1: 0.000000023
+        Validate Data Eval:
+          Num examples: 2071  Total loss: 0.000046190  Mean loss @ 1: 0.000000022
+        Train Data Eval:
+          Num examples: 2057  Total loss: 225.809673050  Mean loss @ 1: 0.109776214
+        Validate Data Eval:
+          Num examples: 2071  Total loss: 220.401262499  Mean loss @ 1: 0.106422628

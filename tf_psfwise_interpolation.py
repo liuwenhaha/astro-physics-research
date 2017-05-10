@@ -21,20 +21,24 @@ import time
 
 
 
-def inference(coords, hidden1_units):
+def inference(coords, hidden1_units, hidden2_units):
     # Hidden1
     with tf.name_scope('hidden1'):
         weights = tf.Variable(tf.truncated_normal([2, hidden1_units], stddev=1.0/math.sqrt(2304.0)))
         biases = tf.Variable(tf.zeros([hidden1_units]), name='biases')
         hidden1 = tf.nn.relu(tf.matmul(coords, weights)+biases)
     # TODO: Try to add Hidden2
+    with tf.name_scope('hidden2'):
+        weights = tf.Variable(tf.truncated_normal([hidden1_units, hidden2_units], stddev=1.0/math.sqrt(2304.0)))
+        biases = tf.Variable(tf.zeros([hidden2_units]), name='biases')
+        hidden2 = tf.nn.relu(tf.matmul(hidden1, weights)+biases)
     # Output
     with tf.name_scope('linear_output'):
-        weights = tf.Variable(tf.truncated_normal([hidden1_units, 2304],
-                                                  stddev=1.0/math.sqrt(float(hidden1_units))), name='weights')
+        weights = tf.Variable(tf.truncated_normal([hidden2_units, 2304],
+                                                  stddev=1.0/math.sqrt(float(hidden2_units))), name='weights')
         biases = tf.Variable(tf.zeros([2304]), name='biases')
         # TODO: Try linear and relu
-        psf_value = tf.matmul(hidden1, weights) + biases
+        psf_value = tf.matmul(hidden2, weights) + biases
     return psf_value
 
 
@@ -174,7 +178,7 @@ def run_training(data_sets, FLAGS):
         FLAGS['batch_size'])
 
     # Build a Graph that computes predictions from the inference model.
-    psf_pred = inference(coord_placeholder, FLAGS['hidden1'])
+    psf_pred = inference(coord_placeholder, FLAGS['hidden1'], FLAGS['hidden2'])
 
     # Add to the Graph the Ops for loss calculation.
     the_loss = loss(psf_pred, psf_labels_placeholder)
