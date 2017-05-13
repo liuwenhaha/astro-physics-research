@@ -48,3 +48,21 @@ Results:
           Num examples: 2057  Total loss: 225.809673050  Mean loss @ 1: 0.109776214
         Validate Data Eval:
           Num examples: 2071  Total loss: 220.401262499  Mean loss @ 1: 0.106422628
+    l2_lr1_ms4000_h1.36_h2.144_bs100:
+        Training Data Eval:
+          Num examples: 2000  Total loss: 0.000967675  Mean loss @ 1: 0.000000484
+        Validation Data Eval:
+          Num examples: 2000  Total loss: 0.000947204  Mean loss @ 1: 0.000000474
+    l2_lr0.1_ms4000_h1.36_h2.144_bs100:
+        Training Data Eval:
+          Num examples: 2000  Total loss: 0.001110022  Mean loss @ 1: 0.000000555
+        Validation Data Eval:
+          Num examples: 2000  Total loss: 0.001062898  Mean loss @ 1: 0.000000531
+    l2_lr10_ms4000_h1.36_h2.144_bs100:
+        Training Data Eval:
+          Num examples: 2000  Total loss: 0.086969081  Mean loss @ 1: 0.000043485
+        Validation Data Eval:
+          Num examples: 2000  Total loss: 0.086431238  Mean loss @ 1: 0.000043216
+
+need more iteration:
+    2-layer lr10

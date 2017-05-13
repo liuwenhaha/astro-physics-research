@@ -17,6 +17,7 @@ import random
 from psf_interpolation_utils import get_ellp, get_ellipticity
 import time
 import tf_psfwise_interpolation as tf_psfwise
+import poly1_interpolation as poly1
 import argparse
 
 
@@ -49,7 +50,7 @@ class PSF_interpolation:
     #     ellip_vector: data to draw ellip dist. bar
     #     coord: coord for each bar
     #     color: magnitude of each ellip
-    # cal_info -> {'poly_1': {'a': <numpy_array_for_a>,
+    # cal_info -> {'poly1': {'a': <numpy_array_for_a>,
     #                         'b': <numpy_array_for_b>, ...
     #                         'predictions': [<numpy_array_psf>, ...]},
     #              'tf_psfwise': {'model': <model for prediction>, ...
@@ -229,140 +230,41 @@ class PSF_interpolation:
                 plt.plot(vertices[:, 0], vertices[:, 1], color=color, linewidth=chip_ellip_bar_wid)
             plt.show()
 
-    def poly_1_interpolation(self):
-        '''
-        apply linear interpolation
-        save matrix a, b, c to cal_info['poly_1']
-        plot coefficient matrix a, b
-        with cache support
-        :return:
-        '''
-        # psf_data -> [{'chip_no': 1,
-        #               'chip_data': [[x,y,RA,Dec,psf_numpy_48_48], ...],
-        #               'chip_train_data': <view_of_chip_data>,
-        #               'chip_validate_data': <view_of_chip_data>,},
-        #              ...]
+    def interpolate(self, method='poly1', **para_dict):
+        if method == 'poly1':
+            poly1.poly1_interpolation(self)
+        if method == 'tf_psfwise':
+            tf_psfwise.tf_psfwise_interpolation(self, **para_dict)
 
-        # Try to load cached plot data
-        to_interpolate = False
-        try:
-            with open('assets/cache/{}_{}/cal_info.p'.format(self.region, self.exp_num),
-                      'rb') as pickle_file:
-                self.cal_info = pickle.load(pickle_file)
-                if not ("poly_1" in self.cal_info):
-                    # TODO: repeat the algor. below
-                    to_interpolate = True
-        except FileNotFoundError:
-            # get train/validate set coordinates
-            to_interpolate = True
-        if to_interpolate:
-            train_coord = []
-            t_z = []
-            for chip_psf_data in self.psf_data:
-                train_coord += [data[2:4] for data in chip_psf_data['chip_train_data']]
-                t_z += [data[4].ravel() for data in chip_psf_data['chip_train_data']]
-            train_coord = np.array(train_coord)
-            t_z = np.array(t_z)
-            # calculate linear interpolation coefficient matrices on train psf data
-            t_x = train_coord[:, 0]
-            t_y = train_coord[:, 1]
-            coef_x_x = np.sum(t_x ** 2)
-            coef_y_y = np.sum(t_y ** 2)
-            coef_x_y = np.sum(t_x * t_y)
-            coef_y_z, coef_z_x = np.zeros(t_z[0].shape), np.zeros(t_z[0].shape)
-            for i in range(len(t_x)):
-                coef_y_z += t_y[i] * t_z[i]
-                coef_z_x += t_x[i] * t_z[i]
-            coef_x = np.sum(t_x)
-            coef_y = np.sum(t_y)
-            coef_z = np.sum(t_z, axis=0)
-            inv_coef = np.linalg.inv(np.array([[coef_x_x, coef_x_y, coef_x],
-                                               [coef_x_y, coef_y_y, coef_y],
-                                               [coef_x, coef_y, len(t_x)]]))
-            opt_A, opt_B, opt_C = np.zeros(t_z[0].shape), np.zeros(t_z[0].shape), np.zeros(t_z[0].shape)
-            coef_rhs = (coef_z_x, coef_y_z, coef_z)
-            for i in range(3):
-                opt_A += inv_coef[0, i] * coef_rhs[i]
-                opt_B += inv_coef[1, i] * coef_rhs[i]
-                opt_C += inv_coef[2, i] * coef_rhs[i]
-            self.cal_info['poly_1'] = [opt_A, opt_B, opt_C]
-            # Cache plot data to file
-            pickle.dump(self.cal_info, open('assets/cache/{}_{}/cal_info.p'.
-                                            format(self.region, self.exp_num), 'wb'))
-        else:
-            opt_A, opt_B, opt_C = self.cal_info['poly_1']
-        # Calculate mse on train/validate set
-        data_sets = {}
-        for tag in ('train', 'validate'):
-            coord = []
-            psf_labels = []
-            chip_data_name = 'chip_{}_data'.format(tag)
-            for chip_psf_data in self.psf_data:
-                coord += [data[2:4] for data in chip_psf_data[chip_data_name]]
-                psf_labels += [data[4].ravel() for data in chip_psf_data[chip_data_name]]
-            coord = np.array(coord)
-            psf_labels = np.array(psf_labels)
-            psf_predictions = np.array([the_coord[0]*opt_A + the_coord[1]*opt_B + opt_C for the_coord in coord])
-            loss = np.sum((psf_labels-psf_predictions) ** 2)
-            data_sets[tag] = [coord, psf_labels]
-            print('{} Data Eval:'.format(tag.title()))
-            print('  Num examples: %d  Total loss: %0.09f  Mean loss @ 1: %0.09f' %
-                  (len(coord), np.asscalar(loss), np.asscalar(loss/len(coord))))
 
-    def predict(self, methods):
+    def predict(self, method='poly1'):
         '''
         use different methods to predict the galaxy psf
         :return:
         '''
-        if not methods:
-            methods = ['poly_1', 'tf_psfwise']
-        pass
-
-    def tf_psfwise_interpolation(self, learning_rate=0.01, hidden1=128, hidden2=32):
-        '''
-        train neural network define in tf_psfwise_interpolation.py
-        save the trained model to cal_info
-        with cache support
-        :return:
-        '''
-
-
-        # psf_data -> [{'chip_no': 1,
-        #               'chip_data': [[x,y,RA,Dec,psf_numpy_48_48], ...],
-        #               'chip_train_data': <view_of_chip_data>,
-        #               'chip_validate_data': <view_of_chip_data>,},
-        #              ...]
-
-        # TODO: prepare datasets
-        data_sets = {}
-        for tag in ('train', 'validate'):
-            coord = []
-            psf_labels = []
-            chip_data_name = 'chip_{}_data'.format(tag)
-            for chip_psf_data in self.psf_data:
-                coord += [data[2:4] for data in chip_psf_data[chip_data_name]]
-                psf_labels += [data[4].ravel() for data in chip_psf_data[chip_data_name]]
-            coord = np.array(coord)
-            psf_labels = np.array(psf_labels)
-            data_sets[tag] = tf_psfwise.DataSet(coord, psf_labels)
-        max_steps = 4000
-        # hidden unit for pixel: 3-12
-        # hidden unit for psf: 91-100
-        batch_size = 100
-        tf_psfwise.execute(learning_rate=learning_rate, max_steps=max_steps, hidden1=hidden1,
-                           hidden2=hidden2, batch_size=batch_size,
-                           log_dir='assets/log/{}_{}/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}'
-                           .format(self.region, self.exp_num, learning_rate, max_steps,
-                                   hidden1, hidden2, batch_size),
-                           datasets=data_sets)
+        # Currently using validate dataset
+        coord = []
+        fits_info = []
+        for chip_psf_data in self.psf_data:
+            coord += [data[2:4] for data in chip_psf_data['chip_train_data']]
+            fits_info += [data[0:4] for data in chip_psf_data['chip_train_data']]
+        coord = np.array(coord)
+        if method == 'poly1':
+            poly1.predict(self, coord, fits_info)
+        elif method == 'tf_psfwise':
+            tf_psfwise.predict(self, coord, fits_info)
+        else:
+            return None
 
 
 if __name__ == '__main__':
     my_psf = PSF_interpolation()
-    # my_psf.poly_1_interpolation()
-    for hidden1, hidden2, learning_rate in (
-            # (32, 128, 10), (32, 128, 1), (32, 128, 0.1),
-            # (36, 144, 10), (36, 144, 1), (36, 144, 0.1),
-                                            (144, 36, 10), (144, 36, 1), (144, 36, 0.1),):
-        my_psf.tf_psfwise_interpolation(hidden1=hidden1, hidden2=hidden2, learning_rate=learning_rate)
+    my_psf.predict('tf_psfwise')
+    # my_psf.interpolate(method='tf_psfwise', hidden1=32, hidden2=144, learning_rate=10)
+    # my_psf.interpolate(method='poly1')
+    # for hidden1, hidden2, learning_rate in (
+    #         (32, 128, 10), (32, 128, 1), (32, 128, 0.1),
+    #         (36, 144, 10), (36, 144, 1), (36, 144, 0.1),
+    #         (144, 36, 10), (144, 36, 1), (144, 36, 0.1)):
+    #     my_psf.tf_psfwise_interpolation(hidden1=hidden1, hidden2=hidden2, learning_rate=learning_rate)
     # my_psf.plot_ellipticities()

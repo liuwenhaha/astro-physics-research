@@ -22,6 +22,26 @@ psf_mesh_y = psf_mesh_y - 24
 # .data return numpy ndarray object
 
 
+def write_predictions(result_dir, psf_predictions, fits_info):
+    info_file_path = result_dir + 'info.dat'
+    fits_file_path = result_dir + 'predictions.fits'
+    with open(info_file_path, 'w') as info_file:
+        info_file.write('x y RA Dec\n')
+        info_file.writelines("%s\n" % "     ".join(map(str, l)) for l in fits_info)
+        info_file.close()
+    num_pred = psf_predictions.shape[0]
+    fits_w = 15
+    fits_h = math.ceil(num_pred/fits_w)
+    fits_image = np.zeros((fits_h*48, fits_w*48))
+
+    for k in range(num_pred):
+        fits_image[((k // 15) * 48):((k // 15 + 1) * 48),
+                   ((k % 15) * 48):((k % 15 + 1) * 48)] = psf_predictions[k].reshape((48,48))
+    hdu = fits.PrimaryHDU(fits_image)
+    hdu.writeto(fits_file_path, overwrite=True)
+    print('poly1 predictions saved to ' + fits_file_path)
+
+
 def get_ellipticity(PSF):
     q11 = np.sum(PSF * psf_mesh_x * psf_mesh_x)
     q12 = np.sum(PSF * psf_mesh_x * psf_mesh_y)

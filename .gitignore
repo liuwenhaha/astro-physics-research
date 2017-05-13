@@ -6,4 +6,6 @@ assets/explosure_831555_w2m0m0/*
 assets/log/*
 assets/history_log/*
 assets/cache/*
+assets/predictions/*
 */.ipynb_checkpoints/*
+__pycache__/*
