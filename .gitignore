@@ -9,3 +9,4 @@ assets/cache/*
 assets/predictions/*
 */.ipynb_checkpoints/*
 __pycache__/*
+/.ipynb_checkpoints/*

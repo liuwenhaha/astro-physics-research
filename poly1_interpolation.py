@@ -54,16 +54,20 @@ def poly1_interpolation(self):
                                            [coef_x, coef_y, len(t_x)]]))
         opt_A, opt_B, opt_C = np.zeros(t_z[0].shape), np.zeros(t_z[0].shape), np.zeros(t_z[0].shape)
         coef_rhs = (coef_z_x, coef_y_z, coef_z)
+        print(opt_A.shape)
         for i in range(3):
             opt_A += inv_coef[0, i] * coef_rhs[i]
             opt_B += inv_coef[1, i] * coef_rhs[i]
             opt_C += inv_coef[2, i] * coef_rhs[i]
         self.cal_info['poly1'] = [opt_A, opt_B, opt_C]
         # Cache plot data to file
-        pickle.dump(self.cal_info, open('assets/cache/{}_{}/cal_info.p'.
-                                        format(self.region, self.exp_num), 'wb'))
+        # pickle.dump(self.cal_info, open('assets/cache/{}_{}/cal_info.p'.
+        #                                 format(self.region, self.exp_num), 'wb'))
     else:
         opt_A, opt_B, opt_C = self.cal_info['poly1']
+    utils.plot_stamp(opt_A.reshape(48,48))
+    utils.plot_stamp(opt_B.reshape(48,48))
+    utils.plot_stamp(opt_C.reshape(48,48))
     # Calculate mse on train/validate set
     data_sets = {}
     for tag in ('train', 'validate'):
@@ -88,7 +92,7 @@ def predict(self, coord, fits_info):
         poly1_interpolation(self)
     opt_A, opt_B, opt_C = self.cal_info['poly1']
     psf_predictions = np.array([the_coord[0] * opt_A + the_coord[1] * opt_B + opt_C for the_coord in coord])
-    result_dir = 'assets/predictions/poly1/'
+    result_dir = 'assets/predictions/{}_{}/poly1/'.format(self.region, self.exp_num)
     utils.write_predictions(result_dir, psf_predictions, fits_info)
 
 

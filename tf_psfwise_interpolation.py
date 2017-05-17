@@ -352,7 +352,7 @@ def predict(self, coord, fits_info,
             coord_placeholder: coord
         }
         psf_predictions = sess.run(psf_pred, feed_dict=feed_dict)
-        result_dir = 'assets/predictions/tf_psfwise/'
+        result_dir = 'assets/predictions/{}_{}/tf_psfwise/'.format(self.region, self.exp_num)
         utils.write_predictions(result_dir, psf_predictions, fits_info)
 
     #     psf_predictions = sess.run([psf_pred], feed_dict={})

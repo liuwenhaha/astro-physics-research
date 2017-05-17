@@ -66,3 +66,70 @@ Results:
 
 need more iteration:
     2-layer lr10
+
+17/05/17
+Train Data Eval:
+  Num examples: 2057  Total loss: 3208995957053830144.000000000  Mean loss @ 1: 1560036926132148.750000000
+Validate Data Eval:
+  Num examples: 2071  Total loss: 13017802912125069312.000000000  Mean loss @ 1: 6285757079732047.000000000
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_2/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 8331506684975491579904.000000000  Mean loss @ 1: 4050319244032810496.000000000
+Validate Data Eval:
+  Num examples: 2071  Total loss: 33798083247930230177792.000000000  Mean loss @ 1: 16319692538836422656.000000000
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_3/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 390805275544182.250000000  Mean loss @ 1: 189987980332.611694336
+Validate Data Eval:
+  Num examples: 2071  Total loss: 1585360763844029.000000000  Mean loss @ 1: 765504955984.562500000
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_4/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 179938119323.596893311  Mean loss @ 1: 87475993.837431639
+Validate Data Eval:
+  Num examples: 2071  Total loss: 729820331159.741210938  Mean loss @ 1: 352399966.759894371
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_5/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 178172264359.908325195  Mean loss @ 1: 86617532.503601521
+Validate Data Eval:
+  Num examples: 2071  Total loss: 722655784305.106689453  Mean loss @ 1: 348940504.251620829
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_6/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 178171926294.555297852  Mean loss @ 1: 86617368.154864028
+Validate Data Eval:
+  Num examples: 2071  Total loss: 722654612053.152221680  Mean loss @ 1: 348939938.219774127
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_7/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 178171928304.840240479  Mean loss @ 1: 86617369.132153735
+Validate Data Eval:
+  Num examples: 2071  Total loss: 722654726495.454101562  Mean loss @ 1: 348939993.479214907
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_8/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 178171928189.863677979  Mean loss @ 1: 86617369.076258466
+Validate Data Eval:
+  Num examples: 2071  Total loss: 722654806689.169433594  Mean loss @ 1: 348940032.201433837
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_9/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 178171928664.412994385  Mean loss @ 1: 86617369.306958184
+Validate Data Eval:
+  Num examples: 2071  Total loss: 722654865807.970581055  Mean loss @ 1: 348940060.747450769
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_10/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 178171928485.194396973  Mean loss @ 1: 86617369.219831988
+Validate Data Eval:
+  Num examples: 2071  Total loss: 722654981309.435302734  Mean loss @ 1: 348940116.518317401
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_11/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 178171928498.813293457  Mean loss @ 1: 86617369.226452738
+Validate Data Eval:
+  Num examples: 2071  Total loss: 722655004032.199584961  Mean loss @ 1: 348940127.490197778
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_12/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 178171928107.800781250  Mean loss @ 1: 86617369.036364019
+Validate Data Eval:
+  Num examples: 2071  Total loss: 722655008132.525634766  Mean loss @ 1: 348940129.470075130
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_13/predictions.fits
+Train Data Eval:
+  Num examples: 2057  Total loss: 178171928754.484039307  Mean loss @ 1: 86617369.350745767
+Validate Data Eval:
+  Num examples: 2071  Total loss: 722655002471.663452148  Mean loss @ 1: 348940126.736679614
+poly1 predictions saved to assets/predictions/w2m0m0_831555/poly_14/predictions.fits

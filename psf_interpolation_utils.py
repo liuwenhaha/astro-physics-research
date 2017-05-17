@@ -2,7 +2,9 @@ from astropy.io import fits
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import os
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from scipy.optimize import least_squares
 
 
 [psf_mesh_x, psf_mesh_y] = np.mgrid[0:48, 0:48]
@@ -23,6 +25,8 @@ psf_mesh_y = psf_mesh_y - 24
 
 
 def write_predictions(result_dir, psf_predictions, fits_info):
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
     info_file_path = result_dir + 'info.dat'
     fits_file_path = result_dir + 'predictions.fits'
     with open(info_file_path, 'w') as info_file:
@@ -148,6 +152,86 @@ def explosure_ellipticity_range(exp_num="831555", region="w2m0m0"):
             for i in range(star_number)]
     print('Exp No.{0} ellip range is {1} to {2}'.format(exp_num, min(all_ellipticities), max(all_ellipticities)))
     print('Number of psf is {}'.format(len(all_ellipticities)))
+
+
+def poly_val_sub(x, y, coeff, order):
+    result = 0
+    for i in range(0, order+1):
+        x_ord = order - i
+        y_ord = i
+        result += (coeff[i]*(x**x_ord)*(y**y_ord))
+    return result
+
+
+def poly_val_all(x, y, coeff, order):
+    result = coeff[0]
+    if order == 0:
+        return result
+    for i in range(1, order+1):
+        result += poly_val_sub(x, y, coeff[int((i+1)*i/2): int((i+2)*(i+1)/2)], i)
+    return result
+
+
+def poly_term_sub(x, y, order):
+    result = []
+    for i in range(0, order+1):
+        x_ord = order - i
+        y_ord = i
+        result.append((x**x_ord)*(y**y_ord))
+    return result
+
+
+def poly_term_all(x, y, order):
+    result = [x*0+1]
+    if order == 0:
+        return np.array(result)
+    for i in range(1, order+1):
+        result += poly_term_sub(x, y, i)
+    return np.array(result)
+
+
+def poly_fit(x, y, z, order):
+    A = poly_term_all(x, y, order).T
+    coeff, r, rank, s = np.linalg.lstsq(A, z)
+    return coeff, r
+
+
+def poly_fun_sub(order):
+    start = int((order+1)*order/2)
+    result = "x[{}]*t[0]**{} + ".format(start, order)
+    start += 1
+    for i in range(1, order):
+        x_coef = order - i
+        y_coef = i
+        x_term = "t[0]**{}".format(x_coef)
+        y_term = "t[1]**{}".format(y_coef)
+        if x_coef == 1:
+            x_term = "t[0]"
+        if y_coef == 1:
+            y_term = "t[1]"
+        result += "x[{}]*{}*{} + ".format(start, x_term, y_term)
+        start += 1
+    result += "x[{}]*t[1]**{}".format(start, order)
+    return result
+
+
+def poly_maker(order):
+    result = 'lambda x, t, y: x[0] + x[1]*t[0] + x[2]*t[1]'
+    if order == 1:
+        return eval(result)
+    for i in range(2, order+1):
+        result += ' + {}'.format(poly_fun_sub(i))
+    return eval(result)
+
+
+def poly_scipy_fit(x, y, z, order):
+    t_train = np.array([x, y])
+    fun = poly_maker(order)
+    TERM_NUM = int((order + 2) * (order + 1) / 2)
+    x0 = np.random.rand(TERM_NUM)
+    res_lsq = least_squares(fun, x0, args=(t_train, z))
+    coeff, cost = res_lsq.x, res_lsq.cost
+    return coeff, cost
 
 
 if __name__ == '__main__':
