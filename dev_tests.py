@@ -1,6 +1,9 @@
 import numpy as np
 from scipy.optimize import least_squares
 import psf_interpolation_utils as utils
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
 
 # x = np.linspace(0, 1, 20)
 # y = np.linspace(0, 1, 20)
@@ -27,7 +30,7 @@ import psf_interpolation_utils as utils
 x = np.linspace(0, 1, 20)
 y = np.linspace(0, 1, 20)
 X, Y = np.meshgrid(x, y, copy=False)
-Z = X**2 + Y**2 + np.random.rand(*X.shape)*0.01
+Z = X**2 + Y**2 + X**9 + np.random.rand(*X.shape)*0.01
 Z = X**2 + Y**2
 
 X = X.flatten()
@@ -69,18 +72,37 @@ def poly_maker(order):
     return eval(result)
 
 
-order = 4
+order = 9
 fun = poly_maker(4)
 TERM_NUM = int((order+2)*(order+1)/2)
 x0=np.random.rand(TERM_NUM)
 # x0=np.random.rand(6)
 # fun = poly_maker(2)
-res_lsq = least_squares(fun, x0, args=(t_train, y_train))
-coeff, cost = res_lsq.x, res_lsq.cost
-print(coeff)
+scipy_coeff, cost = utils.poly_scipy_fit(X, Y, Z, order)
+# scipy_coeff, cost = res_lsq.x, res_lsq.cost
+print(scipy_coeff)
 print(cost)
 # print()
 # print(res_lsq.cost)
-coeff, r = utils.poly_fit(X, Y, Z, order)
-print(coeff)
+numpy_coeff, r = utils.poly_fit(X, Y, Z, order)
+print(numpy_coeff)
 print(r)
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+fig.suptitle('origin')
+ax.plot_trisurf(X, Y, Z)
+plt.show()
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+numpy_Z = utils.poly_val_all(X, Y, numpy_coeff, order)
+fig.suptitle('numpy')
+ax.plot_trisurf(X, Y, numpy_Z)
+plt.show()
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+scipy_Z = utils.poly_val_all(X, Y, scipy_coeff, order)
+fig.suptitle('scipy')
+ax.plot_trisurf(X, Y, scipy_Z)
+plt.show()

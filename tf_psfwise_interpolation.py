@@ -25,13 +25,13 @@ import time
 def inference(coords, hidden1_units, hidden2_units):
     # Hidden1
     with tf.name_scope('hidden1'):
-        weights = tf.Variable(tf.truncated_normal([2, hidden1_units], stddev=1.0/math.sqrt(2304.0)))
+        weights = tf.Variable(tf.truncated_normal([2, hidden1_units], stddev=1.0/math.sqrt(2.0)))
         biases = tf.Variable(tf.zeros([hidden1_units]), name='biases')
         hidden1 = tf.nn.relu(tf.matmul(coords, weights)+biases)
 
     # TODO: Try to add Hidden2
     with tf.name_scope('hidden2'):
-        weights = tf.Variable(tf.truncated_normal([hidden1_units, hidden2_units], stddev=1.0/math.sqrt(2304.0)))
+        weights = tf.Variable(tf.truncated_normal([hidden1_units, hidden2_units], stddev=1.0/math.sqrt(hidden1_units)))
         biases = tf.Variable(tf.zeros([hidden2_units]), name='biases')
         hidden2 = tf.nn.relu(tf.matmul(hidden1, weights)+biases)
     # Output
@@ -299,7 +299,7 @@ def execute(learning_rate=0.01, max_steps=2000, hidden1=128, hidden2=32, batch_s
     run_training(datasets, FLAGS)
 
 
-def tf_psfwise_interpolation(self, learning_rate=0.01, hidden1=36, hidden2=144):
+def tf_psfwise_interpolation(self, learning_rate=0.01, hidden1=36, hidden2=144, max_steps=4000, batch_size=100):
     '''
     train neural network define in tf_psfwise_interpolation.py
     save the trained model to log_dir
@@ -325,10 +325,8 @@ def tf_psfwise_interpolation(self, learning_rate=0.01, hidden1=36, hidden2=144):
         coord = np.array(coord)
         psf_labels = np.array(psf_labels)
         data_sets[tag] = DataSet(coord, psf_labels)
-    max_steps = 4000
     # hidden unit for pixel: 3-12
     # hidden unit for psf: 91-100
-    batch_size = 100
     execute(learning_rate=learning_rate, max_steps=max_steps, hidden1=hidden1,
             hidden2=hidden2, batch_size=batch_size,
             log_dir='assets/log/{}_{}/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}'
@@ -339,8 +337,8 @@ def tf_psfwise_interpolation(self, learning_rate=0.01, hidden1=36, hidden2=144):
 
 
 def predict(self, coord, fits_info,
-            network_model_dir='assets/log/w2m0m0_831555/new/l1_lr0.1_ms4000_h1.36_h2.144_bs100/model.ckpt-3999',
             learning_rate=0.01, max_steps=2000, hidden1=36, hidden2=144, batch_size=100):
+    network_model_dir = 'assets/log/{}_{}/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}/model.ckpt-{}'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, batch_size, max_steps-1)
     with tf.Graph().as_default():
         num_coord = len(coord)
         coord_placeholder, psf_labels_placeholder = placeholder_inputs(num_coord)
@@ -352,8 +350,8 @@ def predict(self, coord, fits_info,
             coord_placeholder: coord
         }
         psf_predictions = sess.run(psf_pred, feed_dict=feed_dict)
-        result_dir = 'assets/predictions/{}_{}/tf_psfwise/'.format(self.region, self.exp_num)
-        utils.write_predictions(result_dir, psf_predictions, fits_info)
+        result_dir = 'assets/predictions/{}_{}/tf_psfwise/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}/'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, batch_size)
+        utils.write_predictions(result_dir, psf_predictions, fits_info, method='tf_psfwise')
 
     #     psf_predictions = sess.run([psf_pred], feed_dict={})
     #     _, loss_value = sess.run([train_op, the_loss],

@@ -18,10 +18,12 @@ import random
 from psf_interpolation_utils import get_ellp, get_ellipticity
 import time
 import tf_psfwise_interpolation as tf_psfwise
+import tf_pixelwise_interpolation as tf_pixelwise
 import poly1_interpolation as poly1
 import poly_interpolation as poly
+import psf_interpolation_utils as utils
 import argparse
-
+import os
 
 # Some constants
 image_file = 'assets/star_power831555_01.fits'
@@ -120,7 +122,19 @@ class PSF_interpolation:
             pickle.dump(self.psf_data, open('assets/cache/{}_{}/psf_data.p'.
                                             format(self.region, self.exp_num), 'wb'))
 
-    def plot_ellipticities(self, tag='exposure', method='tf_psfwise', part='train', cache=False):
+    def collect_origin_data(self, tag='train'):
+        origin_psf = []
+        fits_info = []
+        part_name = 'chip_{}_data'.format(tag)
+        for chip_psf_data in self.psf_data:
+            origin_psf += [data[4].ravel() for data in chip_psf_data[part_name]]
+            fits_info += [data[0:4] for data in chip_psf_data[part_name]]
+        origin_psf = np.array(origin_psf)
+        result_dir = 'assets/predictions/{}_{}/origin/{}/'.format(self.region, self.exp_num, tag)
+        utils.write_predictions(result_dir, origin_psf, fits_info, method=tag)
+
+    def plot_ellipticities(self, tag='exposure', method='tf_psfwise', part='train', cache=False, hidden1=36,
+                           hidden2=144, learning_rate=0.1, max_steps=4000, batch_size=100):
         '''
         calculate and plot ellipticity distribution
         :param tag: 'exposure' or 1 to 36
@@ -182,9 +196,14 @@ class PSF_interpolation:
                 # self.predict(method)
                 if method.startswith('poly'):
                     order = int(method[4:])
-                    if order>1:
-                        method = 'poly_{}'.format(str(order))
-                path_prefix = 'assets/predictions/{}_{}/{}/'.format(self.region, self.exp_num, method)
+                    if order == 1:
+                        method_path = 'poly/' + method
+                    elif order > 1:
+                        method_path = 'poly/poly_{}'.format(str(order))
+                elif method == 'tf_psfwise':
+                    method_path = 'tf_psfwise/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}'.format(learning_rate, max_steps, hidden1,
+                                                                                     hidden2, batch_size)
+                path_prefix = 'assets/predictions/{}_{}/{}/'.format(self.region, self.exp_num, method_path)
                 info_file_path = path_prefix + 'info.dat'
                 fits_file_path = path_prefix + 'predictions.fits'
                 with open(info_file_path, 'r') as info_file:
@@ -251,7 +270,11 @@ class PSF_interpolation:
             plt.tight_layout()
 
             # plt.show()
-            plt.savefig('assets/predictions/ellip_dist/{}.png'.format(method))
+            if method == 'tf_psfwise' or method == 'tf_pixelwise':
+                ellip_dist_dir = 'assets/predictions/ellip_dist/{}/'.format(method)
+                if not os.path.exists(ellip_dist_dir):
+                    os.makedirs(ellip_dist_dir)
+            plt.savefig('assets/predictions/ellip_dist/{}.png'.format(method_path))
             # plt.set_aspect('equal', 'datalim')
             return
 
@@ -295,16 +318,18 @@ class PSF_interpolation:
                 plt.plot(vertices[:, 0], vertices[:, 1], color=color, linewidth=chip_ellip_bar_wid)
             plt.show()
 
-    def interpolate(self, method='poly1', **para_dict):
+    def interpolate(self, method='poly1', **kwargs):
         if method == 'poly1':
             poly1.poly1_interpolation(self)
         if method == 'tf_psfwise':
-            tf_psfwise.tf_psfwise_interpolation(self, **para_dict)
+            tf_psfwise.tf_psfwise_interpolation(self, **kwargs)
+        if method == 'tf_pixelwise':
+            tf_pixelwise.tf_pixelwise_interpolation(self, **kwargs)
         if method.startswith('poly'):
             poly.poly_interpolation(self, int(method[4:]))
 
 
-    def predict(self, method='poly1'):
+    def predict(self, method='poly1', **kwargs):
         '''
         use different methods to predict the galaxy psf
         :return:
@@ -319,7 +344,9 @@ class PSF_interpolation:
         if method == 'poly1':
             poly1.predict(self, coord, fits_info)
         elif method == 'tf_psfwise':
-            tf_psfwise.predict(self, coord, fits_info)
+            tf_psfwise.predict(self, coord, fits_info, **kwargs)
+        elif method == 'tf_pixelwise':
+            tf_pixelwise.predict(self, coord, fits_info)
         elif method.startswith('poly'):
             poly.predict(self, coord, fits_info, int(method[4:]))
         else:
@@ -328,10 +355,26 @@ class PSF_interpolation:
 
 if __name__ == '__main__':
     my_psf = PSF_interpolation()
+    # my_psf.predict('poly1')
+    # my_psf.plot_ellipticities(method='poly1')
+    # my_psf.interpolate(method='tf_pixelwise', learning_rate=0.01, hidden1=3, hidden2=6, pixel_num=1152)
+
+    # for hidden1, hidden2, learning_rate in ((36, 144, 1), (36, 144, 0.1), (36, 144, 0.01)):
+    #     my_psf.interpolate(method='tf_psfwise', hidden1=hidden1, hidden2=hidden2, learning_rate=learning_rate,
+    #                        max_steps=4000, batch_size=100)
+    #     my_psf.predict(method='tf_psfwise', hidden1=hidden1, hidden2=hidden2, learning_rate=learning_rate,
+    #                    max_steps=4000, batch_size=100)
+    #     my_psf.plot_ellipticities(method='tf_psfwise', hidden1=hidden1, hidden2=hidden2, learning_rate=learning_rate,
+    #                               max_steps=4000, batch_size=100)
+
+    for tag in ('train', 'validate'):
+        my_psf.collect_origin_data(tag=tag)
+
+
     # for i in range(2, 15):
     #     my_psf.predict(method='poly'+str(i))
-    for i in range(4, 15):
-        my_psf.plot_ellipticities(tag='exposure', method='poly'+str(i), part='train', cache=False)
+    # for i in range(4, 15):
+    #     my_psf.plot_ellipticities(tag='exposure', method='poly'+str(i), part='train', cache=False)
     # my_psf.predict('tf_psfwise')
     # my_psf.interpolate(method='tf_psfwise', hidden1=32, hidden2=144, learning_rate=10)
     # my_psf.interpolate(method='poly1')

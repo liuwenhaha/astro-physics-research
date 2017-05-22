@@ -10,6 +10,7 @@ from scipy.optimize import least_squares
 [psf_mesh_x, psf_mesh_y] = np.mgrid[0:48, 0:48]
 psf_mesh_x = psf_mesh_x - 24
 psf_mesh_y = psf_mesh_y - 24
+noise_filter = np.exp(-(psf_mesh_x**2+psf_mesh_y**2)/(2*2.5**2))
 
 # star_power -> HDUList (Header Data Unit)
 # HDUObj -> .header .data
@@ -24,7 +25,7 @@ psf_mesh_y = psf_mesh_y - 24
 # .data return numpy ndarray object
 
 
-def write_predictions(result_dir, psf_predictions, fits_info):
+def write_predictions(result_dir, psf_predictions, fits_info, method):
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
     info_file_path = result_dir + 'info.dat'
@@ -43,13 +44,16 @@ def write_predictions(result_dir, psf_predictions, fits_info):
                    ((k % 15) * 48):((k % 15 + 1) * 48)] = psf_predictions[k].reshape((48,48))
     hdu = fits.PrimaryHDU(fits_image)
     hdu.writeto(fits_file_path, overwrite=True)
-    print('poly1 predictions saved to ' + fits_file_path)
+    if method == 'train' or method == 'validate':
+        print('{} saved to '.format(method) + fits_file_path)
+        return
+    print('{} predictions saved to '.format(method) + fits_file_path)
 
 
 def get_ellipticity(PSF):
-    q11 = np.sum(PSF * psf_mesh_x * psf_mesh_x)
-    q12 = np.sum(PSF * psf_mesh_x * psf_mesh_y)
-    q22 = np.sum(PSF * psf_mesh_y * psf_mesh_y)
+    q11 = np.sum(PSF * psf_mesh_x * psf_mesh_x * noise_filter)
+    q12 = np.sum(PSF * psf_mesh_x * psf_mesh_y * noise_filter)
+    q22 = np.sum(PSF * psf_mesh_y * psf_mesh_y * noise_filter)
     epsl1 = (q11 - q22) / (q11 + q22)
     epsl2 = 2 * q12 / (q11 + q22)
     epsl = math.sqrt(epsl1 * epsl1 + epsl2 * epsl2)
@@ -60,9 +64,9 @@ def get_ellipticity(PSF):
 
 
 def get_ellp(PSF):
-    q11 = np.sum(PSF * psf_mesh_x * psf_mesh_x)
-    q12 = np.sum(PSF * psf_mesh_x * psf_mesh_y)
-    q22 = np.sum(PSF * psf_mesh_y * psf_mesh_y)
+    q11 = np.sum(PSF * psf_mesh_x * psf_mesh_x * noise_filter)
+    q12 = np.sum(PSF * psf_mesh_x * psf_mesh_y * noise_filter)
+    q22 = np.sum(PSF * psf_mesh_y * psf_mesh_y * noise_filter)
     epsl1 = (q11 - q22) / (q11 + q22)
     epsl2 = 2 * q12 / (q11 + q22)
     epsl = math.sqrt(epsl1 * epsl1 + epsl2 * epsl2)

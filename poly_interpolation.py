@@ -83,8 +83,8 @@ def predict(self, coord, fits_info, order):
         poly_interpolation(self, order)
     coeffs = self.cal_info[poly_name]
     psf_predictions = np.array([utils.poly_val_all(the_coord[0], the_coord[1], coeffs, order) for the_coord in coord])
-    result_dir = 'assets/predictions/{}_{}/{}/'.format(self.region, self.exp_num, poly_name)
-    utils.write_predictions(result_dir, psf_predictions, fits_info)
+    result_dir = 'assets/predictions/{}_{}/poly/{}/'.format(self.region, self.exp_num, poly_name)
+    utils.write_predictions(result_dir, psf_predictions, fits_info, method=poly_name)
 
 
 
