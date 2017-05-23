@@ -42,6 +42,9 @@ explosure_ellip_bar_wid = 1.6
 # cmap = plt.get_cmap('Blues')
 cmap = plt.get_cmap('YlOrRd')
 
+# Some tuning switches
+do_preprocess = True
+
 
 class PSF_interpolation:
     # per exposure
@@ -70,6 +73,7 @@ class PSF_interpolation:
     star_number = 0
     exp_num = ''
     region = ''
+    chip_avg_train_data=None
 
     def __init__(self, exp_num="831555", region="w2m0m0"):
         '''
@@ -90,7 +94,9 @@ class PSF_interpolation:
         try:
             with open('assets/cache/{}_{}/psf_data.p'.format(self.region, self.exp_num),
                       'rb') as pickle_file:
-                self.psf_data = pickle.load(pickle_file)
+                data = pickle.load(pickle_file)
+                self.psf_data = data['psf_data']
+                self.chip_avg_train_data = data['chip_avg_train_data']
         except FileNotFoundError:
             for i in range(1, 37):
                 fits_file_path = 'assets/explosure_{0}_{1}/star_power{0}_{2}.fits'.format(exp_num, region,
@@ -118,16 +124,94 @@ class PSF_interpolation:
                 chip_info['chip_validate_data'] = chip_data[int(star_number * self.train_data_ratio):]
                 chip_info['chip_data'] = chip_data
                 self.psf_data.append(chip_info)
+            #     TODO: This is a try to pre-process PSF.
+            # avg_PSF = <48*48 pixel-wise mean of **train data**>
+            # stdev_PSF = <48*48 pixel-wise mean of **train data**>
+            # For all train/validate data:
+            # <processed PSF> = <origin PSF> - avg_PSF
+            if do_preprocess:
+                chip_avg_train_datas = []
+                for i in range(36):
+                    chip_train_data = self.psf_data[i]['chip_train_data']
+                    chip_avg_train_data = np.mean(np.array([data[4] for data in chip_train_data]), axis=0)
+                    chip_avg_train_datas.append(chip_avg_train_data)
+                chip_avg_train_data = np.mean(np.array(chip_avg_train_datas), axis=0)
+                print("write chip avg")
+                self.chip_avg_train_data = chip_avg_train_data
+                for i in range(36):
+                    chip_info = self.psf_data[i]
+                    chip_train_data = chip_info['chip_train_data']
+                    chip_validate_data = chip_info['chip_validate_data']
+                    chip_info['chip_train_data'] = [data[:4] + [data[4] - chip_avg_train_data] for data in chip_train_data]
+                    chip_info['chip_validate_data'] = [data[:4] + [data[4] - chip_avg_train_data] for data in chip_validate_data]
+                    # print(len(chip_train_data[0]))
+                    # chip_validate_data = [psf_data - chip_avg_train_data for psf_data in chip_info['chip_validate_data']]
+                    # if i == 0:
+                    #     print("Min and max for chip 1 train data.")
+                    #     psf_min = np.min(np.array([data[4] for data in chip_train_data]), axis=0)
+                    #     psf_max = np.max(np.array([data[4] for data in chip_train_data]), axis=0)
+                    #     print(psf_min)
+                    #     utils.plot_stamp(psf_min)
+                    #     print(psf_max)
+                    #     utils.plot_stamp(psf_max)
+                    #     utils.plot_stamp(self.psf_data[i]['chip_train_data'][0][4])
             # save psf data to cache
-            pickle.dump(self.psf_data, open('assets/cache/{}_{}/psf_data.p'.
-                                            format(self.region, self.exp_num), 'wb'))
+            pickle.dump({'psf_data': self.psf_data, 'chip_avg_train_data': self.chip_avg_train_data},
+                        open('assets/cache/{}_{}/psf_data.p'.format(self.region, self.exp_num), 'wb'))
+
+    def examine(self, method='tf_psfwise', part='train', hidden1=36, hidden2=144, learning_rate=0.1, max_steps=4000, batch_size=100):
+        part_name = part
+        part = part_map[part]
+        psf_num = 0
+        color = []
+        if method.startswith('poly'):
+            order = int(method[4:])
+            if order == 1:
+                method_path = 'poly/' + method
+            elif order > 1:
+                method_path = 'poly/poly_{}'.format(str(order))
+            method_disp = method.title()
+        elif method == 'tf_psfwise':
+            method_path = 'tf_psfwise/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}'.format(learning_rate, max_steps, hidden1,
+                                                                            hidden2, batch_size)
+            method_disp = 'tf_psfwise_l2_lr{}_ms{}_h1.{}_h2.{}_bs{}'.format(learning_rate, max_steps, hidden1,
+                                                                            hidden2, batch_size).title()
+        path_prefix = 'assets/predictions/{}_{}/{}/'.format(self.region, self.exp_num, method_path)
+        info_file_path = path_prefix + 'info.dat'
+        fits_file_path = path_prefix + 'predictions.fits'
+        met_pred = []
+        with open(info_file_path, 'r') as info_file:
+            info_file.readline()
+            psf_count = len(info_file.readlines())
+        with fits.open(fits_file_path) as fits_file:
+            psf_power_data = fits_file[0].data
+            # print(type(psf_power_data))
+            # exit()
+            for k in range(psf_count):
+                met_pred.append(psf_power_data[((k // 15) * 48):((k // 15 + 1) * 48),
+                                ((k % 15) * 48):((k % 15 + 1) * 48)].copy())
+
+        for i in range(36):
+            temp_data = self.psf_data[i][part]
+            color = [get_ellp(data[4]) for data in temp_data] if not do_preprocess else [
+                get_ellp(data[4] + self.chip_avg_train_data) for data in temp_data]
+            color = np.array(color)
+            origin_max_num = np.argmax(color)
+            utils.plot_stamp_comparison(stamp_data_1=temp_data[origin_max_num][4],
+                                        stamp_data_2=met_pred[origin_max_num+psf_num]-self.chip_avg_train_data,
+                                        title_1='Origin train pre-processed PSF on chip{}'.format(i+1),
+                                        title_2=method_disp)
+            # utils.plot_stamp(temp_data[origin_max_num][4]+self.chip_avg_train_data)
+            # exit()
+            psf_num += len(color)
+
 
     def collect_origin_data(self, tag='train'):
         origin_psf = []
         fits_info = []
         part_name = 'chip_{}_data'.format(tag)
         for chip_psf_data in self.psf_data:
-            origin_psf += [data[4].ravel() for data in chip_psf_data[part_name]]
+            origin_psf += [data[4].ravel() for data in chip_psf_data[part_name]] if not do_preprocess else [data[4].ravel()+self.chip_avg_train_data.ravel() for data in chip_psf_data[part_name]]
             fits_info += [data[0:4] for data in chip_psf_data[part_name]]
         origin_psf = np.array(origin_psf)
         result_dir = 'assets/predictions/{}_{}/origin/{}/'.format(self.region, self.exp_num, tag)
@@ -164,8 +248,9 @@ class PSF_interpolation:
                 for i in range(36):
                     temp_data = self.psf_data[i][part]
                     coord += [[data[2], data[3]] for data in temp_data]
-                    ellip += [get_ellipticity(data[4]) for data in temp_data]
-                    color += [get_ellp(data[4]) for data in temp_data]
+                    ellip += [get_ellipticity(data[4]) for data in temp_data] if not do_preprocess else [get_ellipticity(data[4]+self.chip_avg_train_data) for data in temp_data]
+                    color += [get_ellp(data[4]) for data in temp_data] if not do_preprocess else [get_ellp(data[4]+self.chip_avg_train_data) for data in temp_data]
+
                 star_num = len(coord)
                 ellip_vector = [np.array([[coord[n][0] + explosure_ellip_bar_len * ellip[n][0],
                                            coord[n][1] + explosure_ellip_bar_len * ellip[n][1]],
@@ -238,7 +323,7 @@ class PSF_interpolation:
             plt.figure(figsize=(12, 5))
             gs = gridspec.GridSpec(1, 2, width_ratios=[4, 4])
             ax_orig = plt.subplot(gs[0])
-            plt.title('Original Validate PSF Ellip-dist.')
+            plt.title('Original {} PSF Ellip-dist.'.format(part_name.title()))
             plt.xlim(x_min, x_max)
             plt.ylim(y_min, y_max)
             plt.xticks(np.arange(x_min, x_max, 0.2))
@@ -355,11 +440,17 @@ class PSF_interpolation:
 
 if __name__ == '__main__':
     my_psf = PSF_interpolation()
-    # my_psf.predict('poly1')
-    # my_psf.plot_ellipticities(method='poly1')
+
+    # my_psf.interpolate(method='poly3')
+    # my_psf.predict(method='poly3')
+    # my_psf.examine('poly3')
+    my_psf.plot_ellipticities(method='poly3')
+
+
     # my_psf.interpolate(method='tf_pixelwise', learning_rate=0.01, hidden1=3, hidden2=6, pixel_num=1152)
 
     # for hidden1, hidden2, learning_rate in ((36, 144, 1), (36, 144, 0.1), (36, 144, 0.01)):
+    # for hidden1, hidden2, learning_rate in ((64, 256, 1), (128, 512, 0.1)):
     #     my_psf.interpolate(method='tf_psfwise', hidden1=hidden1, hidden2=hidden2, learning_rate=learning_rate,
     #                        max_steps=4000, batch_size=100)
     #     my_psf.predict(method='tf_psfwise', hidden1=hidden1, hidden2=hidden2, learning_rate=learning_rate,
@@ -367,8 +458,8 @@ if __name__ == '__main__':
     #     my_psf.plot_ellipticities(method='tf_psfwise', hidden1=hidden1, hidden2=hidden2, learning_rate=learning_rate,
     #                               max_steps=4000, batch_size=100)
 
-    for tag in ('train', 'validate'):
-        my_psf.collect_origin_data(tag=tag)
+    # for tag in ('train', 'validate'):
+    #     my_psf.collect_origin_data(tag=tag)
 
 
     # for i in range(2, 15):

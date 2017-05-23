@@ -2,6 +2,10 @@ import numpy as np
 import pickle
 import psf_interpolation_utils as utils
 
+
+# Some tuning switches
+do_preprocess = True
+
 def poly1_interpolation(self):
     '''
     apply linear interpolation
@@ -65,9 +69,9 @@ def poly1_interpolation(self):
         #                                 format(self.region, self.exp_num), 'wb'))
     else:
         opt_A, opt_B, opt_C = self.cal_info['poly1']
-    utils.plot_stamp(opt_A.reshape(48,48))
-    utils.plot_stamp(opt_B.reshape(48,48))
-    utils.plot_stamp(opt_C.reshape(48,48))
+    # utils.plot_stamp(opt_A.reshape(48,48))
+    # utils.plot_stamp(opt_B.reshape(48,48))
+    # utils.plot_stamp(opt_C.reshape(48,48))
     # Calculate mse on train/validate set
     data_sets = {}
     for tag in ('train', 'validate'):
@@ -92,8 +96,10 @@ def predict(self, coord, fits_info):
         poly1_interpolation(self)
     opt_A, opt_B, opt_C = self.cal_info['poly1']
     psf_predictions = np.array([the_coord[0] * opt_A + the_coord[1] * opt_B + opt_C for the_coord in coord])
-    result_dir = 'assets/predictions/{}_{}/poly1/'.format(self.region, self.exp_num)
-    utils.write_predictions(result_dir, psf_predictions, fits_info)
+    if do_preprocess:
+        psf_predictions += self.chip_avg_train_data.ravel()
+    result_dir = 'assets/predictions/{}_{}/poly/poly1/'.format(self.region, self.exp_num)
+    utils.write_predictions(result_dir, psf_predictions, fits_info, 'poly1')
 
 
 

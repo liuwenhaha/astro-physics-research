@@ -2,15 +2,20 @@ from astropy.io import fits
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import os
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.optimize import least_squares
 
 
+# Some tuning switches
+do_preprocess = True
+
 [psf_mesh_x, psf_mesh_y] = np.mgrid[0:48, 0:48]
 psf_mesh_x = psf_mesh_x - 24
 psf_mesh_y = psf_mesh_y - 24
 noise_filter = np.exp(-(psf_mesh_x**2+psf_mesh_y**2)/(2*2.5**2))
+# noise_filter = np.ones((48,48))
 
 # star_power -> HDUList (Header Data Unit)
 # HDUObj -> .header .data
@@ -87,11 +92,41 @@ def plot_stamp(stamp_data, plot_axes_extend=(0, 48, 0, 48)):
 
     plt.colorbar(im, cax=ax_cb)
     ax_cb.yaxis.tick_right()
-    for tl in ax_cb.get_yticklabels():
-        tl.set_visible(False)
+    # for tl in ax_cb.get_yticklabels():
+    #     tl.set_visible(False)
+    # ax_cb.yaxis.tick_right()
+
+    # plt.draw()
+    plt.show()
+
+
+def plot_stamp_comparison(stamp_data_1, stamp_data_2, title_1, title_2, plot_axes_extend=(0, 48, 0, 48)):
+
+
+    # draw locatable axes in easy way
+    gs = gridspec.GridSpec(1, 2, width_ratios=[4, 4])
+
+    ax_orig = plt.subplot(gs[0])
+    plt.title(title_1)
+    divider = make_axes_locatable(ax_orig)
+    ax_cb = divider.new_horizontal(size="5%", pad=0.05)
+    fig = ax_orig.get_figure()
+    fig.add_axes(ax_cb)
+    im = ax_orig.imshow(stamp_data_1, extent=plot_axes_extend, interpolation="none")
+    plt.colorbar(im, cax=ax_cb)
     ax_cb.yaxis.tick_right()
 
-    plt.draw()
+    ax_orig = plt.subplot(gs[1])
+    plt.title(title_2)
+    divider = make_axes_locatable(ax_orig)
+    ax_cb = divider.new_horizontal(size="5%", pad=0.05)
+    fig = ax_orig.get_figure()
+    fig.add_axes(ax_cb)
+    im = ax_orig.imshow(stamp_data_2, extent=plot_axes_extend, interpolation="none")
+    plt.colorbar(im, cax=ax_cb)
+    ax_cb.yaxis.tick_right()
+
+    # plt.draw()
     plt.show()
 
 
@@ -220,11 +255,12 @@ def poly_fun_sub(order):
 
 
 def poly_maker(order):
-    result = 'lambda x, t, y: x[0] + x[1]*t[0] + x[2]*t[1]'
+    result = 'lambda x, y, t: y - (x[0] + x[1]*t[0] + x[2]*t[1]'
     if order == 1:
         return eval(result)
     for i in range(2, order+1):
         result += ' + {}'.format(poly_fun_sub(i))
+    result += ')'
     return eval(result)
 
 
@@ -233,7 +269,7 @@ def poly_scipy_fit(x, y, z, order):
     fun = poly_maker(order)
     TERM_NUM = int((order + 2) * (order + 1) / 2)
     x0 = np.random.rand(TERM_NUM)
-    res_lsq = least_squares(fun, x0, args=(t_train, z))
+    res_lsq = least_squares(fun, x0, args=(z, t_train))
     coeff, cost = res_lsq.x, res_lsq.cost
     return coeff, cost
 

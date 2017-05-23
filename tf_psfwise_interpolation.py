@@ -21,6 +21,9 @@ import time
 # psf_placeholder = tf.placeholder(tf.float32, shape=(batch_size, 2304))
 
 
+# Some tuning switches
+do_preprocess = True
+
 
 def inference(coords, hidden1_units, hidden2_units):
     # Hidden1
@@ -350,6 +353,8 @@ def predict(self, coord, fits_info,
             coord_placeholder: coord
         }
         psf_predictions = sess.run(psf_pred, feed_dict=feed_dict)
+        if do_preprocess:
+            psf_predictions += self.chip_avg_train_data.ravel()
         result_dir = 'assets/predictions/{}_{}/tf_psfwise/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}/'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, batch_size)
         utils.write_predictions(result_dir, psf_predictions, fits_info, method='tf_psfwise')
 

@@ -1,6 +1,7 @@
 import numpy as np
 import pickle
 import psf_interpolation_utils as utils
+import time
 
 def poly_interpolation(self, order):
     '''
@@ -15,7 +16,6 @@ def poly_interpolation(self, order):
     #               'chip_validate_data': <view_of_chip_data>,},
     #              ...]
 
-    print('in poly inter')
     # Try to load cached plot data
     to_interpolate = False
     poly_name = 'poly_{}'.format(str(order))
@@ -45,10 +45,12 @@ def poly_interpolation(self, order):
         TERM_NUM = int((order+1)*(order+2)/2)
         coeffs = np.zeros((PIXEL_NUM, TERM_NUM))
         for i in range(PIXEL_NUM):
-            # coeff_term, r_sub = utils.poly_scipy_fit(t_x, t_y, t_z[:, i], order)
-            coeff_term, r_sub = utils.poly_fit(t_x, t_y, t_z[:, i], order)
+            print('\r{}%'.format(i/2304*100), end="")
+            coeff_term, r_sub = utils.poly_scipy_fit(t_x, t_y, t_z[:, i], order)
+            # coeff_term, r_sub = utils.poly_fit(t_x, t_y, t_z[:, i], order)
             coeffs[i] = coeff_term
             r_tot += r_sub
+
         coeffs = coeffs.T.copy()
         # for i in range(TERM_NUM):
         #     utils.plot_stamp(coeffs[i].reshape((48,48)))
