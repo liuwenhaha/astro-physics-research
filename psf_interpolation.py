@@ -441,10 +441,12 @@ class PSF_interpolation:
 if __name__ == '__main__':
     my_psf = PSF_interpolation()
 
+    my_psf.interpolate(method='poly1')
+
     # my_psf.interpolate(method='poly3')
     # my_psf.predict(method='poly3')
     # my_psf.examine('poly3')
-    my_psf.plot_ellipticities(method='poly3')
+    # my_psf.plot_ellipticities(method='poly3')
 
 
     # my_psf.interpolate(method='tf_pixelwise', learning_rate=0.01, hidden1=3, hidden2=6, pixel_num=1152)
