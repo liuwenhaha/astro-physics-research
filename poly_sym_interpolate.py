@@ -87,10 +87,12 @@ def poly_sym_interpolate(self, order):
 
     for i in range(TERM_NUM):
         for j in range(TERM_NUM):
+            # term_func = lambdify((x, y, n), coeff_mat[i][j])
             term_func = lambdify((x, y, n), coeff_mat[i][j], 'numpy')
             coeff_mat_eval[i, j] = np.sum(term_func(t_x, t_y, t_n))
 
     for i in range(TERM_NUM):
+        # term_func = lambdify((x, y), coeff_vect[i])
         term_func = lambdify((x, y), coeff_vect[i], 'numpy')
         term_x_y = term_func(t_x, t_y)
         if isinstance(term_x_y, int):
@@ -98,8 +100,15 @@ def poly_sym_interpolate(self, order):
         else:
             coeff_vect_eval.append(np.sum(t_z * term_x_y[:, np.newaxis], axis=0))
     coeff_vect_eval = np.array(coeff_vect_eval)
+
+    # print(coeff_mat_eval.dtype)
+    # print(np.max(coeff_mat_eval), np.min(coeff_mat_eval))
+    # exit()
+
     inv_coeff_mat_eval = np.linalg.inv(coeff_mat_eval)
     coeff_vect_result = np.dot(inv_coeff_mat_eval, coeff_vect_eval)
+    self.cal_info['poly_sym{}'.format(order)] = coeff_vect_result
+
     # Calculate mse on train/validate set
     data_sets = {}
     for tag in ('train', 'validate'):
@@ -121,7 +130,7 @@ def poly_sym_interpolate(self, order):
 
 
 def predict(self, coord, fits_info, order):
-    poly_name = 'poly_{}'.format(str(order))
+    poly_name = 'poly_sym{}'.format(str(order))
     if not (poly_name in self.cal_info):
         poly_sym_interpolate(self, order)
     coeffs = self.cal_info[poly_name]

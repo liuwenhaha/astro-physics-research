@@ -58,12 +58,15 @@ def poly1_interpolation(self):
                                            [coef_x, coef_y, len(t_x)]]))
         opt_A, opt_B, opt_C = np.zeros(t_z[0].shape), np.zeros(t_z[0].shape), np.zeros(t_z[0].shape)
         coef_rhs = (coef_z_x, coef_y_z, coef_z)
-        print(opt_A.shape)
         for i in range(3):
             opt_A += inv_coef[0, i] * coef_rhs[i]
             opt_B += inv_coef[1, i] * coef_rhs[i]
             opt_C += inv_coef[2, i] * coef_rhs[i]
         self.cal_info['poly1'] = [opt_A, opt_B, opt_C]
+        # print(opt_A)
+        # print(opt_B)
+        # print(opt_C)
+
         # Cache plot data to file
         # pickle.dump(self.cal_info, open('assets/cache/{}_{}/cal_info.p'.
         #                                 format(self.region, self.exp_num), 'wb'))

@@ -194,15 +194,20 @@ def explosure_ellipticity_range(exp_num="831555", region="w2m0m0"):
 
 
 def poly_val_sub(x, y, coeff, order):
-    result = 0
+    result = np.zeros(coeff[0].shape)
     for i in range(0, order+1):
         x_ord = order - i
         y_ord = i
-        result += (coeff[i]*(x**x_ord)*(y**y_ord))
+        # print('x')
+        # print((x**x_ord))
+        # print('y')
+        # print((y**y_ord))
+        result += (((x**x_ord)*(y**y_ord))*coeff[i])
     return result
 
 
 def poly_val_all(x, y, coeff, order):
+    coeff = coeff.copy()
     result = coeff[0]
     if order == 0:
         return result
@@ -257,6 +262,7 @@ def poly_fun_sub(order):
 def poly_maker(order):
     result = 'lambda x, y, t: y - (x[0] + x[1]*t[0] + x[2]*t[1]'
     if order == 1:
+        result += ')'
         return eval(result)
     for i in range(2, order+1):
         result += ' + {}'.format(poly_fun_sub(i))

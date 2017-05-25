@@ -22,6 +22,7 @@ import tf_pixelwise_interpolation as tf_pixelwise
 import poly1_interpolation as poly1
 import poly_interpolation as poly
 import psf_interpolation_utils as utils
+import poly_sym_interpolate as poly_sym
 import argparse
 import os
 
@@ -164,7 +165,7 @@ class PSF_interpolation:
         part = part_map[part]
         psf_num = 0
         color = []
-        if method.startswith('poly'):
+        if method.startswith('poly') and (not method.startswith('poly_sym')):
             order = int(method[4:])
             if order == 1:
                 method_path = 'poly/' + method
@@ -176,6 +177,10 @@ class PSF_interpolation:
                                                                             hidden2, batch_size)
             method_disp = 'tf_psfwise_l2_lr{}_ms{}_h1.{}_h2.{}_bs{}'.format(learning_rate, max_steps, hidden1,
                                                                             hidden2, batch_size).title()
+        elif method.startswith('poly_sym'):
+            order = int(method[8:])
+            method_path = 'poly_sym/poly_sym{}'.format(str(order))
+            method_disp = method.title()
         path_prefix = 'assets/predictions/{}_{}/{}/'.format(self.region, self.exp_num, method_path)
         info_file_path = path_prefix + 'info.dat'
         fits_file_path = path_prefix + 'predictions.fits'
@@ -406,10 +411,14 @@ class PSF_interpolation:
     def interpolate(self, method='poly1', **kwargs):
         if method == 'poly1':
             poly1.poly1_interpolation(self)
+            return
         if method == 'tf_psfwise':
             tf_psfwise.tf_psfwise_interpolation(self, **kwargs)
         if method == 'tf_pixelwise':
             tf_pixelwise.tf_pixelwise_interpolation(self, **kwargs)
+        if method.startswith('poly_sym'):
+            poly_sym.poly_sym_interpolate(self, int(method[8:]))
+            return
         if method.startswith('poly'):
             poly.poly_interpolation(self, int(method[4:]))
 
@@ -432,6 +441,8 @@ class PSF_interpolation:
             tf_psfwise.predict(self, coord, fits_info, **kwargs)
         elif method == 'tf_pixelwise':
             tf_pixelwise.predict(self, coord, fits_info)
+        elif method.startswith('poly_sym'):
+            poly_sym.predict(self, coord, fits_info, int(method[8:]))
         elif method.startswith('poly'):
             poly.predict(self, coord, fits_info, int(method[4:]))
         else:
@@ -441,11 +452,20 @@ class PSF_interpolation:
 if __name__ == '__main__':
     my_psf = PSF_interpolation()
 
-    my_psf.interpolate(method='poly1')
+    # my_psf.interpolate(method='poly1')
+    # my_psf.interpolate(method='poly_sym1')
+    # my_psf.interpolate(method='poly_sym6')
+    print('poly_inter with scipy')
+    for i in range(2, 10):
+        t0=time.time()
+        my_psf.predict(method='poly{}'.format(i))
+        t1=time.time()
+        print('time:{} order:{}\n'.format(t1-t0, i))
+    #     my_psf.predict(method='poly_sym{}'.format(i))
 
     # my_psf.interpolate(method='poly3')
     # my_psf.predict(method='poly3')
-    # my_psf.examine('poly3')
+    # my_psf.examine('poly_sym8')
     # my_psf.plot_ellipticities(method='poly3')
 
 

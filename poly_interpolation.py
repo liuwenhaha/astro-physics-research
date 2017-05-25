@@ -44,6 +44,7 @@ def poly_interpolation(self, order):
         PIXEL_NUM = t_z.shape[1]
         TERM_NUM = int((order+1)*(order+2)/2)
         coeffs = np.zeros((PIXEL_NUM, TERM_NUM))
+        print('order: {}'.format(order))
         for i in range(PIXEL_NUM):
             print('\r{}%'.format(i/2304*100), end="")
             coeff_term, r_sub = utils.poly_scipy_fit(t_x, t_y, t_z[:, i], order)
