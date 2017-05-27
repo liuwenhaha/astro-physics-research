@@ -2,11 +2,11 @@
 .idea/*
 
 # Data
-assets/explosure_831555_w2m0m0/*
+#assets/explosure_831555_w2m0m0/*
 assets/log/*
 assets/history_log/*
-assets/cache/*
-assets/predictions/*
+#assets/cache/*
+assets/predictions/w2m0m0_831555/*
 */.ipynb_checkpoints/*
 __pycache__/*
 /.ipynb_checkpoints/*

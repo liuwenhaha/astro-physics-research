@@ -135,5 +135,7 @@ def predict(self, coord, fits_info, order):
         poly_sym_interpolate(self, order)
     coeffs = self.cal_info[poly_name]
     psf_predictions = np.array([utils.poly_val_all(the_coord[0], the_coord[1], coeffs, order) for the_coord in coord])
+    if do_preprocess:
+        psf_predictions += self.chip_avg_train_data.ravel()
     result_dir = 'assets/predictions/{}_{}/poly_sym/{}/'.format(self.region, self.exp_num, poly_name)
     utils.write_predictions(result_dir, psf_predictions, fits_info, method=poly_name)

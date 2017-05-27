@@ -163,7 +163,7 @@ class PSF_interpolation:
     def examine(self, method='tf_psfwise', part='train', hidden1=36, hidden2=144, learning_rate=0.1, max_steps=4000, batch_size=100):
         part_name = part
         part = part_map[part]
-        psf_num = 0
+
         color = []
         if method.startswith('poly') and (not method.startswith('poly_sym')):
             order = int(method[4:])
@@ -185,9 +185,11 @@ class PSF_interpolation:
         info_file_path = path_prefix + 'info.dat'
         fits_file_path = path_prefix + 'predictions.fits'
         met_pred = []
+        met_coord = []
         with open(info_file_path, 'r') as info_file:
             info_file.readline()
-            psf_count = len(info_file.readlines())
+            met_coord = [info.split()[2:4] for info in info_file.readlines()]
+            psf_count = len(met_coord)
         with fits.open(fits_file_path) as fits_file:
             psf_power_data = fits_file[0].data
             # print(type(psf_power_data))
@@ -196,12 +198,15 @@ class PSF_interpolation:
                 met_pred.append(psf_power_data[((k // 15) * 48):((k // 15 + 1) * 48),
                                 ((k % 15) * 48):((k % 15 + 1) * 48)].copy())
 
+        psf_num = 0
         for i in range(36):
             temp_data = self.psf_data[i][part]
             color = [get_ellp(data[4]) for data in temp_data] if not do_preprocess else [
                 get_ellp(data[4] + self.chip_avg_train_data) for data in temp_data]
             color = np.array(color)
             origin_max_num = np.argmax(color)
+            print(temp_data[origin_max_num][2:4])
+            print(met_coord[origin_max_num+psf_num])
             utils.plot_stamp_comparison(stamp_data_1=temp_data[origin_max_num][4],
                                         stamp_data_2=met_pred[origin_max_num+psf_num]-self.chip_avg_train_data,
                                         title_1='Origin train pre-processed PSF on chip{}'.format(i+1),
@@ -284,12 +289,15 @@ class PSF_interpolation:
                 met_coord = []
                 met_pred = []
                 # self.predict(method)
-                if method.startswith('poly'):
+                if method.startswith('poly') and (not method.startswith('poly_sym')):
                     order = int(method[4:])
                     if order == 1:
                         method_path = 'poly/' + method
                     elif order > 1:
                         method_path = 'poly/poly_{}'.format(str(order))
+                elif method.startswith('poly_sym'):
+                    order = int(method[8:])
+                    method_path = 'poly_sym/poly_sym{}'.format(str(order))
                 elif method == 'tf_psfwise':
                     method_path = 'tf_psfwise/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}'.format(learning_rate, max_steps, hidden1,
                                                                                      hidden2, batch_size)
@@ -455,18 +463,23 @@ if __name__ == '__main__':
     # my_psf.interpolate(method='poly1')
     # my_psf.interpolate(method='poly_sym1')
     # my_psf.interpolate(method='poly_sym6')
-    print('poly_inter with scipy')
-    for i in range(2, 10):
-        t0=time.time()
-        my_psf.predict(method='poly{}'.format(i))
-        t1=time.time()
-        print('time:{} order:{}\n'.format(t1-t0, i))
-    #     my_psf.predict(method='poly_sym{}'.format(i))
+    # print('poly_inter with scipy')
+    # for i in range(2, 10):
+    #     t0=time.time()
+    #     my_psf.predict(method='poly{}'.format(i))
+    #     t1=time.time()
+    #     my_psf.plot_ellipticities(method='poly{}'.format(i))
+    #     print('time:{} order:{}\n'.format(t1-t0, i))
+        # my_psf.predict(method='poly_sym{}'.format(i))
 
     # my_psf.interpolate(method='poly3')
     # my_psf.predict(method='poly3')
-    # my_psf.examine('poly_sym8')
-    # my_psf.plot_ellipticities(method='poly3')
+
+    my_psf.examine('poly5')
+
+
+    # for i in range(10, 15):
+    #     my_psf.plot_ellipticities(method='poly_sym{}'.format(i))
 
 
     # my_psf.interpolate(method='tf_pixelwise', learning_rate=0.01, hidden1=3, hidden2=6, pixel_num=1152)

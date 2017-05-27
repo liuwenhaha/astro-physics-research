@@ -3,6 +3,9 @@ import pickle
 import psf_interpolation_utils as utils
 import time
 
+# Some tuning switches
+do_preprocess = True
+
 def poly_interpolation(self, order):
     '''
     apply polynomial <order>_th interpolation exposure-wise
@@ -46,9 +49,9 @@ def poly_interpolation(self, order):
         coeffs = np.zeros((PIXEL_NUM, TERM_NUM))
         print('order: {}'.format(order))
         for i in range(PIXEL_NUM):
-            print('\r{}%'.format(i/2304*100), end="")
-            coeff_term, r_sub = utils.poly_scipy_fit(t_x, t_y, t_z[:, i], order)
-            # coeff_term, r_sub = utils.poly_fit(t_x, t_y, t_z[:, i], order)
+            # print('\r{}%'.format(i/2304*100), end="")
+            # coeff_term, r_sub = utils.poly_scipy_fit(t_x, t_y, t_z[:, i], order)
+            coeff_term, r_sub = utils.poly_fit(t_x, t_y, t_z[:, i], order)
             coeffs[i] = coeff_term
             r_tot += r_sub
 
@@ -86,6 +89,8 @@ def predict(self, coord, fits_info, order):
         poly_interpolation(self, order)
     coeffs = self.cal_info[poly_name]
     psf_predictions = np.array([utils.poly_val_all(the_coord[0], the_coord[1], coeffs, order) for the_coord in coord])
+    if do_preprocess:
+        psf_predictions += self.chip_avg_train_data.ravel()
     result_dir = 'assets/predictions/{}_{}/poly/{}/'.format(self.region, self.exp_num, poly_name)
     utils.write_predictions(result_dir, psf_predictions, fits_info, method=poly_name)
 
