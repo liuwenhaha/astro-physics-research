@@ -254,7 +254,7 @@ class PSF_interpolation:
         plt.savefig('paper/train_validate_dist.png')
 
 
-    def plot_ellipticities(self, tag='exposure', method='tf_psfwise', part='train', cache=False, hidden1=36,
+    def plot_ellipticities(self, tag='exposure', method='tf_psfwise', part='validate', cache=False, hidden1=36,
                            hidden2=144, hidden3=576, learning_rate=0.1, max_steps=4000, batch_size=100):
         '''
         calculate and plot ellipticity distribution
@@ -265,7 +265,7 @@ class PSF_interpolation:
         part_name = part
         part = part_map[part]
         if method:
-            part_name = 'train'
+            part_name = 'validate'
             part = part_map[part_name]
         coord = []
         ellip = []
@@ -420,6 +420,8 @@ class PSF_interpolation:
             # plt.set_aspect('equal', 'datalim')
             return
 
+
+
         # TODO: Finish chip plot
         # TODO: save the chip data to cal_info, retrieve to avoid recalculation
         if tag in range(1, 37):
@@ -486,8 +488,8 @@ class PSF_interpolation:
         coord = []
         fits_info = []
         for chip_psf_data in self.psf_data:
-            coord += [data[2:4] for data in chip_psf_data['chip_train_data']]
-            fits_info += [data[0:4] for data in chip_psf_data['chip_train_data']]
+            coord += [data[2:4] for data in chip_psf_data['chip_validate_data']]
+            fits_info += [data[0:4] for data in chip_psf_data['chip_validate_data']]
         coord = np.array(coord)
         if method == 'poly1':
             poly1.predict(self, coord, fits_info)
@@ -509,14 +511,23 @@ if __name__ == '__main__':
     my_psf = PSF_interpolation()
 
     # my_psf.plot_train_validate_dist()
-    # hidden1 = 36
-    # hidden2 = 144
-    # hidden3 = 576
-    # learning_rate = 0.1
-    # max_steps = 500
-    # batch_size = 10
-    # my_psf.examine(method='tf_psfwise_chip', learning_rate=learning_rate, max_steps=max_steps, hidden1=hidden1,
+
+    hidden1 = 36
+    hidden2 = 144
+    hidden3 = 576
+    learning_rate = 0.1
+    max_steps = 500
+    batch_size = 10
+    # my_psf.predict(method='tf_psfwise_chip', learning_rate=learning_rate, max_steps=max_steps, hidden1=hidden1,
     #                hidden2=hidden2, hidden3=hidden3, batch_size=batch_size)
+    # my_psf.predict('poly8')
+    # my_psf.predict('poly_sym8')
+
+    my_psf.plot_ellipticities(method='tf_psfwise_chip', learning_rate=learning_rate, max_steps=max_steps, hidden1=hidden1,
+                   hidden2=hidden2, hidden3=hidden3, batch_size=batch_size)
+    my_psf.plot_ellipticities(method='poly8')
+    my_psf.plot_ellipticities(method='poly_sym8')
+
 
     # hidden1 = 36
     # hidden2 = 144
@@ -581,7 +592,7 @@ if __name__ == '__main__':
     # my_psf.interpolate(method='poly3')
     # my_psf.predict(method='poly3')
 
-    my_psf.examine('poly_sym10')
+    # my_psf.examine('poly8')
 
 
     # for i in range(10, 15):

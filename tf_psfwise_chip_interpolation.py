@@ -350,7 +350,7 @@ def tf_psfwise_chip_interpolation(self, learning_rate=0.01, hidden1=36, hidden2=
 
 
 def predict(self,
-            learning_rate=0.01, max_steps=2000, hidden1=36, hidden2=144, hidden3=576, batch_size=100, tag='train'):
+            learning_rate=0.01, max_steps=2000, hidden1=36, hidden2=144, hidden3=576, batch_size=100, tag='validate'):
     fits_info = []
 
     for chip_num in range(36):
