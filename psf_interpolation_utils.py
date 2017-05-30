@@ -100,6 +100,50 @@ def plot_stamp(stamp_data, plot_axes_extend=(0, 48, 0, 48)):
     plt.show()
 
 
+def plot_exp_stamp_comparison(origins, predictions):
+    gs = gridspec.GridSpec(9, 8, width_ratios=[1, 1, 1, 1, 1, 1, 1, 1], height_ratios=[1, 1, 1, 1, 1, 1, 1, 1, 1])
+    plot_axes_extend = (0, 48, 0, 48)
+    plt.figure(figsize=(9, 8))
+
+
+    for i in range(36):
+        vmin = min(np.min(origins[i]), np.min(predictions[i]))
+        vmax = max(np.max(origins[i]), np.max(predictions[i]))
+        left_grid_num = 2 * (i % 4)
+        right_grid_num = left_grid_num + 1
+        row_grid_num = i // 4
+
+        ax_orig = plt.subplot(gs[row_grid_num, left_grid_num])
+        plt.title('Chip {}'.format(i + 1), fontsize=10)
+        fig = ax_orig.get_figure()
+        # im = ax_orig.imshow(origins[i], extent=plot_axes_extend, interpolation="none")
+        im = ax_orig.imshow(origins[i], vmin=vmin, vmax=vmax, extent=plot_axes_extend, interpolation="none")
+        plt.setp(ax_orig.get_yticklabels(), visible=False)
+        plt.setp(ax_orig.get_xticklabels(), visible=False)
+        ax_orig.tick_params(axis=u'both', which=u'both', length=0)
+
+        ax_met = plt.subplot(gs[row_grid_num, right_grid_num])
+        plt.title('Pred.{}'.format(i + 1), fontsize=10)
+        fig = ax_met.get_figure()
+        # im = ax_met.imshow(predictions[i], extent=plot_axes_extend, interpolation="none")
+        im = ax_met.imshow(predictions[i], vmin=vmin, vmax=vmax, extent=plot_axes_extend, interpolation="none")
+        plt.setp(ax_met.get_yticklabels(), visible=False)
+        plt.setp(ax_met.get_xticklabels(), visible=False)
+        ax_met.tick_params(axis=u'both', which=u'both', length=0)
+
+        # if i % 4 == 3:
+        # divider = make_axes_locatable(ax_met)
+        # ax_cb = divider.new_horizontal(size="5%", pad=0.05)
+        # fig.add_axes(ax_cb)
+        # plt.colorbar(im, cax=ax_cb)
+        # ax_cb.yaxis.tick_right()
+        # ax_cb.yaxis.set_tick_params(labelsize=5)
+
+    fig = plt.gcf()
+    fig.tight_layout()
+    plt.show()
+
+
 def plot_stamp_comparison(stamp_data_1, stamp_data_2, title_1, title_2, plot_axes_extend=(0, 48, 0, 48)):
 
 

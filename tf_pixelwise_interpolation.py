@@ -4,6 +4,7 @@ import tensorflow as tf
 import math
 import numpy as np
 import psf_interpolation_utils as utils
+import pickle
 from tensorflow.contrib.learn.python.learn.datasets import base
 from tensorflow.python.framework import dtypes
 
@@ -21,7 +22,8 @@ import time
 # psf_placeholder = tf.placeholder(tf.float32, shape=(batch_size, 2304))
 
 
-
+# Some tuning switches
+do_preprocess = True
 
 def inference(coords, hidden1_units, hidden2_units):
     # Hidden1
@@ -61,8 +63,9 @@ def loss(pixel_values, pixel_labels):
 def training(loss, learning_rate):
     tf.summary.scalar('loss', loss)
     # TODO: Try different optimizer
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-    global_step = tf.Variable(0, name='global_step', trainable=False)
+    # optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+    global_step = tf.Variable(0, name='global_step', trainable=False, dtype=tf.int64)
+    optimizer = tf.train.AdagradDAOptimizer(learning_rate=learning_rate, global_step=global_step)
     train_op = optimizer.minimize(loss=loss, global_step=global_step)
     return train_op
 
@@ -301,7 +304,7 @@ def execute(learning_rate=0.01, max_steps=10000, hidden1=3, hidden2=6, batch_siz
     run_training(datasets, FLAGS)
 
 
-def tf_pixelwise_interpolation(self, learning_rate=0.01, hidden1=3, hidden2=6, pixel_num=0):
+def tf_pixelwise_interpolation(self, learning_rate=0.01, hidden1=3, hidden2=6, max_steps=1000, batch_size=100):
     '''
     train neural network define in tf_pixelwise_interpolation.py
     save the trained model to log_dir
@@ -316,50 +319,68 @@ def tf_pixelwise_interpolation(self, learning_rate=0.01, hidden1=3, hidden2=6, p
     #              ...]
 
     # TODO: prepare datasets
-    data_sets = {}
-    for tag in ('train', 'validate'):
-        coord = []
-        pixel_labels = []
-        chip_data_name = 'chip_{}_data'.format(tag)
-        for chip_psf_data in self.psf_data:
-            coord += [data[2:4] for data in chip_psf_data[chip_data_name]]
-            pixel_labels += [data[4][pixel_num//48, pixel_num%48] for data in chip_psf_data[chip_data_name]]
-        coord = np.array(coord)
-        pixel_labels = np.array(pixel_labels).reshape((len(pixel_labels), 1))
-        # TODO: extract pixel data
-        data_sets[tag] = DataSet(coord, pixel_labels)
+    for pixel_num in range(2304):
+    # pixel_num = 1149
+        print('pixel_num: {}'.format(pixel_num))
+        data_sets = {}
+        for tag in ('train', 'validate'):
+            coord = []
+            pixel_labels = []
+            chip_data_name = 'chip_{}_data'.format(tag)
+            for chip_psf_data in self.psf_data:
+                coord += [data[2:4] for data in chip_psf_data[chip_data_name]]
+                pixel_labels += [data[4][pixel_num//48, pixel_num%48] for data in chip_psf_data[chip_data_name]]
+            coord = np.array(coord)
+            pixel_labels = np.array(pixel_labels).reshape((len(pixel_labels), 1))
+            # TODO: extract pixel data
+            data_sets[tag] = DataSet(coord, pixel_labels)
 
-    max_steps = 10000
-    # hidden unit for pixel: 3-12
-    # hidden unit for psf: 91-100
-    batch_size = 100
-    execute(learning_rate=learning_rate, max_steps=max_steps, hidden1=hidden1,
-            hidden2=hidden2, batch_size=batch_size,
-            log_dir='assets/log/pixel_wise/{}_{}/pn{}_l2_lr{}_ms{}_h1.{}_h2.{}_bs{}'
-            # log_dir='assets/log/{}_{}/l1_lr{}_ms{}_h1.{}_bs{}'
-            .format(self.region, self.exp_num, pixel_num, learning_rate, max_steps,
-                   hidden1, hidden2, batch_size),
-            datasets=data_sets)
+        # hidden unit for pixel: 3-12
+        # hidden unit for psf: 91-100
+        execute(learning_rate=learning_rate, max_steps=max_steps, hidden1=hidden1,
+                hidden2=hidden2, batch_size=batch_size,
+                log_dir='assets/log/pixel_wise/{}_{}/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}/pn{}'
+                # log_dir='assets/log/{}_{}/l1_lr{}_ms{}_h1.{}_bs{}'
+                .format(self.region, self.exp_num, learning_rate, max_steps,
+                       hidden1, hidden2, batch_size, pixel_num),
+                datasets=data_sets)
 
 
-def predict(self, coord, fits_info, learning_rate=0.01, max_steps=10000, hidden1=3, hidden2=6, batch_size=100, pixel_num=0):
-    network_model_dir = 'assets/log/pixel_wise/{}_{}/pn{}_l2_lr{}_ms{}_h1.{}_h2.{}_bs{}/model.ckpt-{}'.format(self.region, self.exp_num, pixel_num, learning_rate, max_steps, hidden1, hidden2, batch_size, max_steps-1),
-    with tf.Graph().as_default():
-        num_coord = len(coord)
-        coord_placeholder, pixel_labels_placeholder = placeholder_inputs(num_coord)
-        pixel_pred = inference(coord_placeholder, hidden1, hidden2)
-        new_saver = tf.train.Saver()
-        sess = tf.Session()
-        new_saver.restore(sess, network_model_dir)
-        feed_dict = {
-            coord_placeholder: coord
-        }
-        pixel_predictions = sess.run(pixel_pred, feed_dict=feed_dict)
-        return pixel_predictions
-        # TODO: Design pixelwise saving directory
-        # TODO: Or just assemble the information together
-        # result_dir = 'assets/predictions/{}_{}/tf_pixelwise/'.format(self.region, self.exp_num)
-        # utils.write_predictions(result_dir, pixel_predictions, fits_info)
+def predict(self, coord, fits_info, learning_rate=0.01, max_steps=1000, hidden1=3, hidden2=6, batch_size=100):
+    pixel_predictions = []
+    try:
+        with open('assets/cache/{}_{}/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}_pixel_predictions.p'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, batch_size),
+                  'rb') as pickle_file:
+            pixel_predictions = pickle.load(pickle_file)['pixel_predictions']
+
+    except FileNotFoundError:
+        exit()
+        for pixel_num in range(2304):
+            network_model_dir = 'assets/log/pixel_wise/{}_{}/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}/pn{}/model.ckpt-{}'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, batch_size, pixel_num, max_steps-1)
+            with tf.Graph().as_default():
+                num_coord = len(coord)
+                coord_placeholder, pixel_labels_placeholder = placeholder_inputs(num_coord)
+                pixel_pred = inference(coord_placeholder, hidden1, hidden2)
+                new_saver = tf.train.Saver()
+                sess = tf.Session()
+                new_saver.restore(sess, network_model_dir)
+                feed_dict = {
+                    coord_placeholder: coord
+                }
+                sub_pixel_predictions = sess.run(pixel_pred, feed_dict=feed_dict)
+                pixel_predictions.append(sub_pixel_predictions.reshape(sub_pixel_predictions.shape[0]))
+            # TODO: Design pixelwise saving directory
+            # TODO: Or just assemble the information together
+        pixel_predictions = np.array(pixel_predictions)
+        pickle.dump({'pixel_predictions': pixel_predictions},
+                    open('assets/cache/{}_{}/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}_pixel_predictions.p'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, batch_size), 'wb'))
+
+
+    pixel_predictions = pixel_predictions.T.copy()
+    if do_preprocess:
+        pixel_predictions += self.chip_avg_train_data.ravel()
+    result_dir = 'assets/predictions/{}_{}/tf_pixelwise/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}/'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, batch_size)
+    utils.write_predictions(result_dir, pixel_predictions, fits_info, method='tf_pixelwise')
 
     #     psf_predictions = sess.run([psf_pred], feed_dict={})
     #     _, loss_value = sess.run([train_op, the_loss],

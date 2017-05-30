@@ -1,0 +1,364 @@
+
+
+chip-wise psf_wise interpolation
+Interpolating Chip 0.
+Step 0: loss = 3464.49609 (0.017 sec)
+Step 100: loss = 1.56762 (0.009 sec)
+Step 200: loss = 2.37937 (0.008 sec)
+Step 300: loss = 1.25987 (0.009 sec)
+Step 400: loss = 0.54996 (0.008 sec)
+Training Data Eval:
+  Num examples: 40  Total loss: 0.000206019  Mean loss @ 1: 0.000005150
+Validation Data Eval:
+  Num examples: 40  Total loss: 0.000251978  Mean loss @ 1: 0.000006299
+Interpolating Chip 1.
+Step 0: loss = 3342.97534 (0.022 sec)
+Step 100: loss = 1.01126 (0.008 sec)
+Step 200: loss = 0.25403 (0.009 sec)
+Step 300: loss = 0.81359 (0.010 sec)
+Step 400: loss = 0.70087 (0.009 sec)
+Training Data Eval:
+  Num examples: 60  Total loss: 0.000242801  Mean loss @ 1: 0.000004047
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000204451  Mean loss @ 1: 0.000003408
+Interpolating Chip 2.
+Step 0: loss = 3173.96826 (0.023 sec)
+Step 100: loss = 1.11621 (0.008 sec)
+Step 200: loss = 1.38229 (0.008 sec)
+Step 300: loss = 0.33252 (0.010 sec)
+Step 400: loss = 0.98684 (0.009 sec)
+Training Data Eval:
+  Num examples: 70  Total loss: 0.000304580  Mean loss @ 1: 0.000004351
+Validation Data Eval:
+  Num examples: 70  Total loss: 0.000400792  Mean loss @ 1: 0.000005726
+Interpolating Chip 3.
+Step 0: loss = 3146.65283 (0.020 sec)
+Step 100: loss = 0.43574 (0.009 sec)
+Step 200: loss = 0.49223 (0.012 sec)
+Step 300: loss = 0.78729 (0.012 sec)
+Step 400: loss = 2.42629 (0.010 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000192763  Mean loss @ 1: 0.000003855
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000234226  Mean loss @ 1: 0.000004685
+Interpolating Chip 4.
+Step 0: loss = 3187.10010 (0.051 sec)
+Step 100: loss = 2.06750 (0.015 sec)
+Step 200: loss = 1.62794 (0.015 sec)
+Step 300: loss = 1.38898 (0.015 sec)
+Step 400: loss = 1.44058 (0.014 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000263134  Mean loss @ 1: 0.000005263
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000172690  Mean loss @ 1: 0.000003454
+Interpolating Chip 5.
+Step 0: loss = 3151.90259 (0.029 sec)
+Step 100: loss = 1.42264 (0.015 sec)
+Step 200: loss = 0.52680 (0.013 sec)
+Step 300: loss = 2.42031 (0.019 sec)
+Step 400: loss = 0.53201 (0.018 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000266862  Mean loss @ 1: 0.000005337
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000193082  Mean loss @ 1: 0.000003862
+Interpolating Chip 6.
+Step 0: loss = 3059.63916 (0.024 sec)
+Step 100: loss = 0.78675 (0.018 sec)
+Step 200: loss = 0.67184 (0.014 sec)
+Step 300: loss = 0.72918 (0.012 sec)
+Step 400: loss = 0.53091 (0.012 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000253567  Mean loss @ 1: 0.000005071
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000278029  Mean loss @ 1: 0.000005561
+Interpolating Chip 7.
+Step 0: loss = 3450.55835 (0.024 sec)
+Step 100: loss = 0.36146 (0.013 sec)
+Step 200: loss = 0.66829 (0.013 sec)
+Step 300: loss = 0.78499 (0.015 sec)
+Step 400: loss = 0.37922 (0.014 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000109621  Mean loss @ 1: 0.000002192
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000160801  Mean loss @ 1: 0.000003216
+Interpolating Chip 8.
+Step 0: loss = 3176.73779 (0.024 sec)
+Step 100: loss = 2.36381 (0.016 sec)
+Step 200: loss = 1.07053 (0.015 sec)
+Step 300: loss = 1.29909 (0.013 sec)
+Step 400: loss = 0.95126 (0.014 sec)
+Training Data Eval:
+  Num examples: 60  Total loss: 0.000357612  Mean loss @ 1: 0.000005960
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000426291  Mean loss @ 1: 0.000007105
+Interpolating Chip 9.
+Step 0: loss = 3320.07861 (0.027 sec)
+Step 100: loss = 0.50118 (0.015 sec)
+Step 200: loss = 0.45024 (0.015 sec)
+Step 300: loss = 0.73195 (0.014 sec)
+Step 400: loss = 1.85041 (0.013 sec)
+Training Data Eval:
+  Num examples: 40  Total loss: 0.000180640  Mean loss @ 1: 0.000004516
+Validation Data Eval:
+  Num examples: 40  Total loss: 0.000183179  Mean loss @ 1: 0.000004579
+Interpolating Chip 10.
+Step 0: loss = 3217.79492 (0.021 sec)
+Step 100: loss = 0.41830 (0.012 sec)
+Step 200: loss = 0.82275 (0.012 sec)
+Step 300: loss = 0.77256 (0.014 sec)
+Step 400: loss = 0.53707 (0.013 sec)
+Training Data Eval:
+  Num examples: 60  Total loss: 0.000243923  Mean loss @ 1: 0.000004065
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000361614  Mean loss @ 1: 0.000006027
+Interpolating Chip 11.
+Step 0: loss = 3288.68530 (0.024 sec)
+Step 100: loss = 0.59464 (0.012 sec)
+Step 200: loss = 0.40748 (0.011 sec)
+Step 300: loss = 1.82297 (0.011 sec)
+Step 400: loss = 2.96469 (0.014 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000244050  Mean loss @ 1: 0.000004881
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000274908  Mean loss @ 1: 0.000005498
+Interpolating Chip 12.
+Step 0: loss = 3157.85254 (0.023 sec)
+Step 100: loss = 2.59907 (0.014 sec)
+Step 200: loss = 0.94238 (0.015 sec)
+Step 300: loss = 1.76350 (0.016 sec)
+Step 400: loss = 0.36211 (0.015 sec)
+Training Data Eval:
+  Num examples: 60  Total loss: 0.000567420  Mean loss @ 1: 0.000009457
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000192059  Mean loss @ 1: 0.000003201
+Interpolating Chip 13.
+Step 0: loss = 3448.98291 (0.023 sec)
+Step 100: loss = 0.49710 (0.015 sec)
+Step 200: loss = 1.22568 (0.013 sec)
+Step 300: loss = 0.75616 (0.014 sec)
+Step 400: loss = 0.65523 (0.011 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000206526  Mean loss @ 1: 0.000004131
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000199168  Mean loss @ 1: 0.000003319
+Interpolating Chip 14.
+Step 0: loss = 3221.31006 (0.021 sec)
+Step 100: loss = 2.64733 (0.012 sec)
+Step 200: loss = 0.58407 (0.012 sec)
+Step 300: loss = 0.73812 (0.015 sec)
+Step 400: loss = 0.63554 (0.014 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000315051  Mean loss @ 1: 0.000006301
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000360791  Mean loss @ 1: 0.000006013
+Interpolating Chip 15.
+Step 0: loss = 3100.13354 (0.040 sec)
+Step 100: loss = 1.31904 (0.017 sec)
+Step 200: loss = 0.54653 (0.016 sec)
+Step 300: loss = 0.71092 (0.016 sec)
+Step 400: loss = 0.93667 (0.015 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000196240  Mean loss @ 1: 0.000003925
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000403825  Mean loss @ 1: 0.000008076
+Interpolating Chip 16.
+Step 0: loss = 3404.67090 (0.023 sec)
+Step 100: loss = 1.40152 (0.014 sec)
+Step 200: loss = 0.80153 (0.015 sec)
+Step 300: loss = 0.67377 (0.015 sec)
+Step 400: loss = 1.50093 (0.015 sec)
+Training Data Eval:
+  Num examples: 60  Total loss: 0.000356271  Mean loss @ 1: 0.000005938
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000363634  Mean loss @ 1: 0.000006061
+Interpolating Chip 17.
+Step 0: loss = 3662.16187 (0.023 sec)
+Step 100: loss = 0.52566 (0.014 sec)
+Step 200: loss = 0.60722 (0.015 sec)
+Step 300: loss = 0.27062 (0.015 sec)
+Step 400: loss = 0.44527 (0.014 sec)
+Training Data Eval:
+  Num examples: 40  Total loss: 0.000101687  Mean loss @ 1: 0.000002542
+Validation Data Eval:
+  Num examples: 40  Total loss: 0.000217306  Mean loss @ 1: 0.000005433
+Interpolating Chip 18.
+Step 0: loss = 3364.24268 (0.022 sec)
+Step 100: loss = 0.69217 (0.013 sec)
+Step 200: loss = 2.86134 (0.013 sec)
+Step 300: loss = 0.88189 (0.011 sec)
+Step 400: loss = 0.27480 (0.011 sec)
+Training Data Eval:
+  Num examples: 60  Total loss: 0.000399930  Mean loss @ 1: 0.000006666
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000371727  Mean loss @ 1: 0.000006195
+Interpolating Chip 19.
+Step 0: loss = 3034.47314 (0.021 sec)
+Step 100: loss = 1.06013 (0.013 sec)
+Step 200: loss = 3.11799 (0.013 sec)
+Step 300: loss = 3.58800 (0.013 sec)
+Step 400: loss = 2.92614 (0.011 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000278303  Mean loss @ 1: 0.000005566
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000379414  Mean loss @ 1: 0.000007588
+Interpolating Chip 20.
+Step 0: loss = 3339.40137 (0.022 sec)
+Step 100: loss = 1.25216 (0.013 sec)
+Step 200: loss = 1.60892 (0.014 sec)
+Step 300: loss = 1.26625 (0.013 sec)
+Step 400: loss = 1.76439 (0.011 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000243686  Mean loss @ 1: 0.000004874
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000218802  Mean loss @ 1: 0.000004376
+Interpolating Chip 21.
+Step 0: loss = 3166.84180 (0.021 sec)
+Step 100: loss = 0.63567 (0.011 sec)
+Step 200: loss = 0.56648 (0.015 sec)
+Step 300: loss = 0.78688 (0.014 sec)
+Step 400: loss = 1.37122 (0.013 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000175301  Mean loss @ 1: 0.000003506
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000153446  Mean loss @ 1: 0.000003069
+Interpolating Chip 22.
+Step 0: loss = 3294.50024 (0.054 sec)
+Step 100: loss = 0.69902 (0.019 sec)
+Step 200: loss = 0.20726 (0.017 sec)
+Step 300: loss = 0.38375 (0.015 sec)
+Step 400: loss = 1.13088 (0.016 sec)
+Training Data Eval:
+  Num examples: 60  Total loss: 0.000203039  Mean loss @ 1: 0.000003384
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000235178  Mean loss @ 1: 0.000003920
+Interpolating Chip 23.
+Step 0: loss = 3165.33984 (0.025 sec)
+Step 100: loss = 0.90734 (0.020 sec)
+Step 200: loss = 2.39101 (0.016 sec)
+Step 300: loss = 1.69262 (0.023 sec)
+Step 400: loss = 1.22254 (0.022 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000320620  Mean loss @ 1: 0.000006412
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000258398  Mean loss @ 1: 0.000005168
+Interpolating Chip 24.
+Step 0: loss = 3706.83179 (0.058 sec)
+Step 100: loss = 0.51984 (0.017 sec)
+Step 200: loss = 0.78385 (0.022 sec)
+Step 300: loss = 0.78329 (0.016 sec)
+Step 400: loss = 1.17131 (0.022 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000262084  Mean loss @ 1: 0.000005242
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000229436  Mean loss @ 1: 0.000004589
+Interpolating Chip 25.
+Step 0: loss = 3348.32422 (0.083 sec)
+Step 100: loss = 1.10001 (0.018 sec)
+Step 200: loss = 0.62002 (0.021 sec)
+Step 300: loss = 0.88230 (0.015 sec)
+Step 400: loss = 0.62355 (0.015 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000217488  Mean loss @ 1: 0.000004350
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000169184  Mean loss @ 1: 0.000003384
+Interpolating Chip 26.
+Step 0: loss = 3193.91357 (0.038 sec)
+Step 100: loss = 1.28082 (0.017 sec)
+Step 200: loss = 0.52907 (0.020 sec)
+Step 300: loss = 1.23509 (0.015 sec)
+Step 400: loss = 0.86774 (0.013 sec)
+Training Data Eval:
+  Num examples: 60  Total loss: 0.000162932  Mean loss @ 1: 0.000002716
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000311583  Mean loss @ 1: 0.000005193
+Interpolating Chip 27.
+Step 0: loss = 3312.78906 (0.034 sec)
+Step 100: loss = 0.46292 (0.015 sec)
+Step 200: loss = 1.01966 (0.016 sec)
+Step 300: loss = 1.25759 (0.014 sec)
+Step 400: loss = 0.69370 (0.018 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000163264  Mean loss @ 1: 0.000003265
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000214228  Mean loss @ 1: 0.000004285
+Interpolating Chip 28.
+Step 0: loss = 3370.02441 (0.032 sec)
+Step 100: loss = 0.72522 (0.015 sec)
+Step 200: loss = 0.76300 (0.012 sec)
+Step 300: loss = 1.09150 (0.015 sec)
+Step 400: loss = 0.94139 (0.023 sec)
+Training Data Eval:
+  Num examples: 60  Total loss: 0.000206853  Mean loss @ 1: 0.000003448
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000193915  Mean loss @ 1: 0.000003232
+Interpolating Chip 29.
+Step 0: loss = 3309.64453 (0.028 sec)
+Step 100: loss = 0.58528 (0.015 sec)
+Step 200: loss = 0.46147 (0.013 sec)
+Step 300: loss = 0.87064 (0.013 sec)
+Step 400: loss = 0.42518 (0.016 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000243413  Mean loss @ 1: 0.000004868
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000229174  Mean loss @ 1: 0.000004583
+Interpolating Chip 30.
+Step 0: loss = 3079.47510 (0.028 sec)
+Step 100: loss = 0.33499 (0.013 sec)
+Step 200: loss = 0.44145 (0.023 sec)
+Step 300: loss = 0.78115 (0.015 sec)
+Step 400: loss = 0.47115 (0.015 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000173260  Mean loss @ 1: 0.000003465
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000187680  Mean loss @ 1: 0.000003754
+Interpolating Chip 31.
+Step 0: loss = 2885.02759 (0.021 sec)
+Step 100: loss = 1.32622 (0.013 sec)
+Step 200: loss = 0.83024 (0.016 sec)
+Step 300: loss = 1.63342 (0.016 sec)
+Step 400: loss = 1.11234 (0.016 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000252583  Mean loss @ 1: 0.000005052
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000232535  Mean loss @ 1: 0.000004651
+Interpolating Chip 32.
+Step 0: loss = 2949.42725 (0.027 sec)
+Step 100: loss = 0.78633 (0.013 sec)
+Step 200: loss = 1.01987 (0.014 sec)
+Step 300: loss = 0.43821 (0.015 sec)
+Step 400: loss = 0.60054 (0.015 sec)
+Training Data Eval:
+  Num examples: 40  Total loss: 0.000099447  Mean loss @ 1: 0.000002486
+Validation Data Eval:
+  Num examples: 40  Total loss: 0.000097385  Mean loss @ 1: 0.000002435
+Interpolating Chip 33.
+Step 0: loss = 2898.73145 (0.025 sec)
+Step 100: loss = 0.73153 (0.013 sec)
+Step 200: loss = 0.29187 (0.016 sec)
+Step 300: loss = 0.61680 (0.018 sec)
+Step 400: loss = 0.77477 (0.015 sec)
+Training Data Eval:
+  Num examples: 50  Total loss: 0.000152781  Mean loss @ 1: 0.000003056
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000200519  Mean loss @ 1: 0.000004010
+Interpolating Chip 34.
+Step 0: loss = 3418.70361 (0.035 sec)
+Step 100: loss = 1.87163 (0.018 sec)
+Step 200: loss = 0.61464 (0.018 sec)
+Step 300: loss = 0.52732 (0.017 sec)
+Step 400: loss = 0.59255 (0.015 sec)
+Training Data Eval:
+  Num examples: 60  Total loss: 0.000168256  Mean loss @ 1: 0.000002804
+Validation Data Eval:
+  Num examples: 60  Total loss: 0.000157300  Mean loss @ 1: 0.000002622
+Interpolating Chip 35.
+Step 0: loss = 3266.62695 (0.073 sec)
+Step 100: loss = 0.89944 (0.019 sec)
+Step 200: loss = 0.84251 (0.016 sec)
+Step 300: loss = 0.48251 (0.015 sec)
+Step 400: loss = 0.38784 (0.014 sec)
+Training Data Eval:
+  Num examples: 40  Total loss: 0.000118650  Mean loss @ 1: 0.000002966
+Validation Data Eval:
+  Num examples: 50  Total loss: 0.000194350  Mean loss @ 1: 0.000003887
+tf_psfwise predictions saved to assets/predictions/w2m0m0_831555/tf_psfwise_chip/l3_lr0.1_ms500_h1.36_h2.144_h3.576_bs10/predictions.fits

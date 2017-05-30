@@ -25,25 +25,31 @@ import time
 do_preprocess = True
 
 
-def inference(coords, hidden1_units, hidden2_units):
+def inference(coords, hidden1_units, hidden2_units, hidden3_units):
     # Hidden1
     with tf.name_scope('hidden1'):
         weights = tf.Variable(tf.truncated_normal([2, hidden1_units], stddev=1.0/math.sqrt(2.0)))
         biases = tf.Variable(tf.zeros([hidden1_units]), name='biases')
-        hidden1 = tf.nn.relu(tf.matmul(coords, weights)+biases)
+        hidden1 = tf.nn.tanh(tf.matmul(coords, weights)+biases)
 
-    # TODO: Try to add Hidden2
     with tf.name_scope('hidden2'):
         weights = tf.Variable(tf.truncated_normal([hidden1_units, hidden2_units], stddev=1.0/math.sqrt(hidden1_units)))
         biases = tf.Variable(tf.zeros([hidden2_units]), name='biases')
-        hidden2 = tf.nn.relu(tf.matmul(hidden1, weights)+biases)
+        hidden2 = tf.nn.tanh(tf.matmul(hidden1, weights)+biases)
+
+    # TODO: Try to add Hidden3
+    with tf.name_scope('hidden3'):
+        weights = tf.Variable(tf.truncated_normal([hidden2_units, hidden3_units], stddev=1.0/math.sqrt(hidden2_units)))
+        biases = tf.Variable(tf.zeros([hidden3_units]), name='biases')
+        hidden3 = tf.nn.tanh(tf.matmul(hidden2, weights)+biases)
+
     # Output
     with tf.name_scope('linear_output'):
-        weights = tf.Variable(tf.truncated_normal([hidden2_units, 2304],
-                                                  stddev=1.0/math.sqrt(float(hidden2_units))), name='weights')
+        weights = tf.Variable(tf.truncated_normal([hidden3_units, 2304],
+                                                  stddev=1.0/math.sqrt(float(hidden3_units))), name='weights')
         biases = tf.Variable(tf.zeros([2304]), name='biases')
         # TODO: Try linear and relu
-        psf_value = tf.matmul(hidden2, weights) + biases
+        psf_value = tf.matmul(hidden3, weights) + biases
 
     # # Output
     # with tf.name_scope('linear_output'):
@@ -63,8 +69,9 @@ def loss(pixel_values, pixel_labels):
 def training(loss, learning_rate):
     tf.summary.scalar('loss', loss)
     # TODO: Try different optimizer
-    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-    global_step = tf.Variable(0, name='global_step', trainable=False)
+    # optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+    global_step = tf.Variable(0, name='global_step', trainable=False, dtype=tf.int64)
+    optimizer = tf.train.AdagradDAOptimizer(learning_rate=learning_rate, global_step=global_step)
     train_op = optimizer.minimize(loss=loss, global_step=global_step)
     return train_op
 
@@ -191,7 +198,7 @@ def run_training(data_sets, FLAGS):
         FLAGS['batch_size'])
 
     # Build a Graph that computes predictions from the inference model.
-    psf_pred = inference(coord_placeholder, FLAGS['hidden1'], FLAGS['hidden2'])
+    psf_pred = inference(coord_placeholder, FLAGS['hidden1'], FLAGS['hidden2'], FLAGS['hidden3'])
 
     # Add to the Graph the Ops for loss calculation.
     the_loss = loss(psf_pred, psf_labels_placeholder)
@@ -284,14 +291,15 @@ def run_training(data_sets, FLAGS):
 
 
 
-def execute(learning_rate=0.01, max_steps=2000, hidden1=128, hidden2=32, batch_size=100,
-            log_dir='assets/log/w2m0m0_831555/lr0.01_ms2000_h1.128_h2.32_bs100',
+def execute(learning_rate=0.01, max_steps=2000, hidden1=36, hidden2=144, hidden3=576, batch_size=100,
+            log_dir='assets/log/w2m0m0_831555/lr0.01_ms2000_h1.36_h2.144_h2.576_bs100',
             datasets=None):
     FLAGS = {}
     FLAGS['learning_rate'] = learning_rate
     FLAGS['max_steps'] = max_steps
     FLAGS['hidden1'] = hidden1
     FLAGS['hidden2'] = hidden2
+    FLAGS['hidden3'] = hidden3
     FLAGS['batch_size'] = batch_size
     FLAGS['log_dir'] = log_dir
 
@@ -302,7 +310,7 @@ def execute(learning_rate=0.01, max_steps=2000, hidden1=128, hidden2=32, batch_s
     run_training(datasets, FLAGS)
 
 
-def tf_psfwise_interpolation(self, learning_rate=0.01, hidden1=36, hidden2=144, max_steps=4000, batch_size=100):
+def tf_psfwise_interpolation(self, learning_rate=0.01, hidden1=36, hidden2=144, hidden3=576, max_steps=4000, batch_size=100):
     '''
     train neural network define in tf_psfwise_interpolation.py
     save the trained model to log_dir
@@ -331,21 +339,21 @@ def tf_psfwise_interpolation(self, learning_rate=0.01, hidden1=36, hidden2=144, 
     # hidden unit for pixel: 3-12
     # hidden unit for psf: 91-100
     execute(learning_rate=learning_rate, max_steps=max_steps, hidden1=hidden1,
-            hidden2=hidden2, batch_size=batch_size,
-            log_dir='assets/log/{}_{}/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}'
+            hidden2=hidden2, hidden3=hidden3, batch_size=batch_size,
+            log_dir='assets/log/{}_{}/l3_lr{}_ms{}_h1.{}_h2.{}_h3.{}_bs{}'
             # log_dir='assets/log/{}_{}/l1_lr{}_ms{}_h1.{}_bs{}'
             .format(self.region, self.exp_num, learning_rate, max_steps,
-                   hidden1, hidden2, batch_size),
+                   hidden1, hidden2, hidden3, batch_size),
             datasets=data_sets)
 
 
 def predict(self, coord, fits_info,
-            learning_rate=0.01, max_steps=2000, hidden1=36, hidden2=144, batch_size=100):
-    network_model_dir = 'assets/log/{}_{}/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}/model.ckpt-{}'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, batch_size, max_steps-1)
+            learning_rate=0.01, max_steps=2000, hidden1=36, hidden2=144, hidden3=576, batch_size=100):
+    network_model_dir = 'assets/log/{}_{}/l3_lr{}_ms{}_h1.{}_h2.{}_h3.{}_bs{}/model.ckpt-{}'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, hidden3, batch_size, max_steps-1)
     with tf.Graph().as_default():
         num_coord = len(coord)
         coord_placeholder, psf_labels_placeholder = placeholder_inputs(num_coord)
-        psf_pred = inference(coord_placeholder, hidden1, hidden2)
+        psf_pred = inference(coord_placeholder, hidden1, hidden2, hidden3)
         new_saver = tf.train.Saver()
         sess = tf.Session()
         new_saver.restore(sess, network_model_dir)
@@ -355,7 +363,7 @@ def predict(self, coord, fits_info,
         psf_predictions = sess.run(psf_pred, feed_dict=feed_dict)
         if do_preprocess:
             psf_predictions += self.chip_avg_train_data.ravel()
-        result_dir = 'assets/predictions/{}_{}/tf_psfwise/l2_lr{}_ms{}_h1.{}_h2.{}_bs{}/'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, batch_size)
+        result_dir = 'assets/predictions/{}_{}/tf_psfwise/l3_lr{}_ms{}_h1.{}_h2.{}_h3.{}_bs{}/'.format(self.region, self.exp_num, learning_rate, max_steps, hidden1, hidden2, hidden3, batch_size)
         utils.write_predictions(result_dir, psf_predictions, fits_info, method='tf_psfwise')
 
     #     psf_predictions = sess.run([psf_pred], feed_dict={})
