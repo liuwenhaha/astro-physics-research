@@ -100,6 +100,57 @@ def plot_stamp(stamp_data, plot_axes_extend=(0, 48, 0, 48)):
     plt.show()
 
 
+def plot_poly_time_mse():
+
+    order = np.arange(2, 16)
+    poly_t = np.array([1.365, 3.886, 11.586, 26.251, 42.253, 72.480, 90.284, 108.470, 138.845, 192.046, 256.779, 259.470, 338.568, 374.656])
+    poly_ls = np.array([0.0922, 0.0917, 0.0911, 0.091, 0.091, 0.091, 0.091, 0.091, 0.091, 0.091, 0.091, 0.091, 0.091, 0.091])
+    poly_sym_t = np.array([1.463, 2.084, 2.671, 5.618, 7.79, 9.008, 14.818, 16.757, 26.379, 37.252, 53.648, 73.333, 85.389, 229.718])
+    poly_sym_ls = np.array([0.0922, 0.0142, 0.8183, 0.5754, 1.0464, 0.2794, 0.1186, 0.2807, 1.7702, 0.1397, 3.8278, 1.2142, 10.271, 13.1549])
+
+    plt.figure(figsize=(6, 6))
+    plt.plot(order, poly_t, '-o', label='Poly-Numpy')
+    plt.plot(order, poly_sym_t, '--s', label='Poly-SymPy')
+    plt.ylim(ymin=0)
+    plt.xlim(xmin=0)
+    plt.xlabel('Order')
+    plt.ylabel('Time (s)')
+    # plt.ylabel(r'$Time (s)$', fontsize=18)
+    plt.legend()
+    plt.show()
+
+    f, (ax, ax2) = plt.subplots(2, 1, sharex=True)
+    ax.plot(order, poly_ls, '-o', label='Poly-Numpy')
+    ax.plot(order, poly_sym_ls, '--s', label='Poly-SymPy')
+    ax2.plot(order, poly_ls, '-o', label='Poly-Numpy')
+    ax2.plot(order, poly_sym_ls, '--s', label='Poly-SymPy')
+    ax.set_ylim(9.5, 13.5)
+    ax2.set_ylim(0, 4.5)
+    ax.set_xlim(xmin=0)
+    ax2.set_xlim(xmin=0)
+
+    ax.spines['bottom'].set_visible(False)
+    ax2.spines['top'].set_visible(False)
+    ax.xaxis.tick_top()
+    ax.tick_params(labeltop='off', length=0)  # don't put tick labels at the top
+    ax2.xaxis.tick_bottom()
+
+    d = .015
+    kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+    ax.plot((-d, +d), (-d, +d), **kwargs)  # top-left diagonal
+    ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-right diagonal
+    kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
+    ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
+    ax2.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
+
+
+    plt.xlabel('Order')
+    plt.ylabel('MSE on Train Set')
+    # plt.ylabel(r'$Time (s)$', fontsize=18)
+    plt.legend()
+    plt.show()
+
+
 def plot_exp_stamp_comparison(origins, predictions):
     gs = gridspec.GridSpec(9, 8, width_ratios=[1, 1, 1, 1, 1, 1, 1, 1], height_ratios=[1, 1, 1, 1, 1, 1, 1, 1, 1])
     plot_axes_extend = (0, 48, 0, 48)

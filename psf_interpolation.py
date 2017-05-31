@@ -363,6 +363,46 @@ class PSF_interpolation:
                 (met_x_min, met_y_min), (met_x_max, met_y_max) = np.min(met_coord, axis=0), np.max(met_coord, axis=0)
                 met_color_min, met_color_max = np.min(met_color), np.max(met_color)
 
+            raw_ellip = ellip*np.array([color, color]).T.copy()
+            met_raw_ellip = met_ellip*np.array([met_color, met_color]).T.copy()
+            residual_raw_ellip = raw_ellip - met_raw_ellip
+            residual_color = np.sqrt(np.sum(residual_raw_ellip**2, axis=1))
+            res_color_min, res_color_max = np.min(residual_color), np.max(residual_color)
+            residual_ellip = residual_raw_ellip/np.array([residual_color, residual_color]).T.copy()
+            residual_ellip_vector = [np.array([[met_coord[n][0] + explosure_ellip_bar_len * residual_ellip[n][0],
+                                               met_coord[n][1] + explosure_ellip_bar_len * residual_ellip[n][1]],
+                                              [met_coord[n][0] - explosure_ellip_bar_len * residual_ellip[n][0],
+                                               met_coord[n][1] - explosure_ellip_bar_len * residual_ellip[n][1]]])
+                                    for n in range(pred_num)]
+
+            # Plot Residual Histogram
+            plt.figure(figsize=(6, 6))
+            n, bins, patches = plt.hist(residual_color, 40, normed=1, facecolor='blue', alpha=0.75)
+            plt.xlabel('Ellipticity Residual')
+            plt.ylabel('Probability')
+            plt.title('{}'.format(method.title()))
+            plt.grid(True)
+            plt.show()
+
+            # Plot Residual distribution
+
+            plt.figure(figsize=(6, 5))
+            plt.title('{} {} PSF Residual Ellip-dist.'.format(method.title(), part_name.title()))
+            plt.xlim(x_min, x_max)
+            plt.ylim(y_min, y_max)
+            plt.xticks(np.arange(x_min, x_max, 0.2))
+            plt.yticks(np.arange(y_min, y_max, 0.2))
+            norm = plt.Normalize(vmin=color_min, vmax=color_max)
+            for i in range(psf_num):
+                vertices = residual_ellip_vector[i]
+                cl = cmap(norm(color[i]))
+                plt.plot(vertices[:, 0], vertices[:, 1], color=cl, linewidth=explosure_ellip_bar_wid)
+            sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+            sm._A = []
+            plt.colorbar(sm)
+            plt.show()
+            return
+
 
             # Plot the distributions
 
@@ -401,6 +441,8 @@ class PSF_interpolation:
             plt.setp(ax_met.get_yticklabels(), visible=False)
             plt.colorbar(met_sm)
             plt.tight_layout()
+
+
 
             # plt.show()
             if method == 'tf_psfwise' or method == 'tf_pixelwise' or method == 'tf_psfwise_chip':
@@ -509,6 +551,7 @@ class PSF_interpolation:
 
 if __name__ == '__main__':
     my_psf = PSF_interpolation()
+    # utils.plot_poly_time_mse()
 
     # my_psf.plot_train_validate_dist()
 
@@ -525,8 +568,15 @@ if __name__ == '__main__':
 
     my_psf.plot_ellipticities(method='tf_psfwise_chip', learning_rate=learning_rate, max_steps=max_steps, hidden1=hidden1,
                    hidden2=hidden2, hidden3=hidden3, batch_size=batch_size)
-    my_psf.plot_ellipticities(method='poly8')
-    my_psf.plot_ellipticities(method='poly_sym8')
+    # my_psf.plot_ellipticities(method='poly8')
+    # my_psf.plot_ellipticities(method='poly_sym8')
+
+    # for tag in ['poly', 'poly_sym']:
+    #     for i in range(2, 16):
+    #         t0=time.time()
+    #         my_psf.interpolate('{}{}'.format(tag, i))
+    #         t1=time.time()
+    #         print('{} order {} Time {}'.format(tag,i,t1-t0))
 
 
     # hidden1 = 36

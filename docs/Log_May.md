@@ -119,6 +119,7 @@ time:11.46686315536499 order:9
 
 
 
+
 With default implementation
 Train Data Eval:
   Num examples: 2057  Total loss: 189.761195765  Mean loss @ 1: 0.092251432
@@ -210,8 +211,6 @@ time:73.70235300064087 order:14
 poly_sym14 predictions saved to assets/predictions/w2m0m0_831555/poly_sym/poly_sym14/predictions.fits
 
 
-
-
 order: 2
 Train Data Eval:
   Num examples: 2057  Total loss: 189.697194659  Mean loss @ 1: 0.092220318
@@ -275,3 +274,164 @@ Validate Data Eval:
   Num examples: 2071  Total loss: 204.106558029  Mean loss @ 1: 0.098554591
 poly_9 predictions saved to assets/predictions/w2m0m0_831555/poly/poly_9/predictions.fits
 time:120.6299455165863 order:9
+
+
+
+
+
+
+
+
+
+
+Train Data Eval:
+  Num examples: 2057  Total loss: 189.697194659  Mean loss @ 1: 0.092220318
+Validate Data Eval:
+  Num examples: 2071  Total loss: 205.638847143  Mean loss @ 1: 0.099294470
+poly order 2 Time 1.3648707866668701
+Train Data Eval:
+  Num examples: 2057  Total loss: 188.719602134  Mean loss @ 1: 0.091745067
+Validate Data Eval:
+  Num examples: 2071  Total loss: 205.731353368  Mean loss @ 1: 0.099339137
+poly order 3 Time 3.885572910308838
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.380124754  Mean loss @ 1: 0.091093887
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.226002648  Mean loss @ 1: 0.098612266
+poly order 4 Time 11.586049795150757
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.274435606  Mean loss @ 1: 0.091042506
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.111471043  Mean loss @ 1: 0.098556963
+poly order 5 Time 26.251185417175293
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.279708850  Mean loss @ 1: 0.091045070
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.089191848  Mean loss @ 1: 0.098546206
+poly order 6 Time 42.25289750099182
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.279114917  Mean loss @ 1: 0.091044781
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.096101181  Mean loss @ 1: 0.098549542
+poly order 7 Time 72.48010516166687
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.279502223  Mean loss @ 1: 0.091044969
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.101636820  Mean loss @ 1: 0.098552215
+poly order 8 Time 90.28399300575256
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.280305199  Mean loss @ 1: 0.091045360
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.106558029  Mean loss @ 1: 0.098554591
+poly order 9 Time 108.47036600112915
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.281331465  Mean loss @ 1: 0.091045859
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.111250543  Mean loss @ 1: 0.098556857
+poly order 10 Time 138.84452056884766
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.282508489  Mean loss @ 1: 0.091046431
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.115981229  Mean loss @ 1: 0.098559141
+poly order 11 Time 192.0459566116333
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.283810558  Mean loss @ 1: 0.091047064
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.120975402  Mean loss @ 1: 0.098561553
+poly order 12 Time 256.7793571949005
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.285235287  Mean loss @ 1: 0.091047757
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.126469592  Mean loss @ 1: 0.098564206
+poly order 13 Time 295.4696171283722
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.286794558  Mean loss @ 1: 0.091048515
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.132752480  Mean loss @ 1: 0.098567239
+poly order 14 Time 338.5681347846985
+Train Data Eval:
+  Num examples: 2057  Total loss: 187.284762629  Mean loss @ 1: 0.091047527
+Validate Data Eval:
+  Num examples: 2071  Total loss: 204.094948017  Mean loss @ 1: 0.098548985
+poly order 15 Time 374.6561772823334
+
+
+Train Data Eval:
+  Num examples: 2057  Total loss: 189.761195765  Mean loss @ 1: 0.092251432
+Validate Data Eval:
+  Num examples: 2071  Total loss: 205.673016185  Mean loss @ 1: 0.099310969
+poly_sym order 2 Time 1.4634969234466553
+Train Data Eval:
+  Num examples: 2057  Total loss: 292.948385792  Mean loss @ 1: 0.142415355
+Validate Data Eval:
+  Num examples: 2071  Total loss: 313.804377516  Mean loss @ 1: 0.151523118
+poly_sym order 3 Time 2.0840981006622314
+Train Data Eval:
+  Num examples: 2057  Total loss: 1684.335626368  Mean loss @ 1: 0.818831126
+Validate Data Eval:
+  Num examples: 2071  Total loss: 1789.041629169  Mean loss @ 1: 0.863853998
+poly_sym order 4 Time 2.6718480587005615
+Train Data Eval:
+  Num examples: 2057  Total loss: 1183.720373888  Mean loss @ 1: 0.575459589
+Validate Data Eval:
+  Num examples: 2071  Total loss: 1266.313067029  Mean loss @ 1: 0.611450057
+poly_sym order 5 Time 5.618374586105347
+Train Data Eval:
+  Num examples: 2057  Total loss: 2152.610557513  Mean loss @ 1: 1.046480582
+Validate Data Eval:
+  Num examples: 2071  Total loss: 2286.076853951  Mean loss @ 1: 1.103851692
+poly_sym order 6 Time 9.008587837219238
+Train Data Eval:
+  Num examples: 2057  Total loss: 574.878534730  Mean loss @ 1: 0.279474251
+Validate Data Eval:
+  Num examples: 2071  Total loss: 627.113708744  Mean loss @ 1: 0.302807199
+poly_sym order 7 Time 7.78952956199646
+Train Data Eval:
+  Num examples: 2057  Total loss: 244.016066616  Mean loss @ 1: 0.118627159
+Validate Data Eval:
+  Num examples: 2071  Total loss: 259.774471547  Mean loss @ 1: 0.125434318
+poly_sym order 8 Time 14.817805528640747
+Train Data Eval:
+  Num examples: 2057  Total loss: 577.477422031  Mean loss @ 1: 0.280737687
+Validate Data Eval:
+  Num examples: 2071  Total loss: 612.367111990  Mean loss @ 1: 0.295686679
+poly_sym order 9 Time 16.7568039894104
+Train Data Eval:
+  Num examples: 2057  Total loss: 3641.369620392  Mean loss @ 1: 1.770233165
+Validate Data Eval:
+  Num examples: 2071  Total loss: 3715.239042178  Mean loss @ 1: 1.793934834
+poly_sym order 10 Time 26.37955641746521
+Train Data Eval:
+  Num examples: 2057  Total loss: 287.437609637  Mean loss @ 1: 0.139736320
+Validate Data Eval:
+  Num examples: 2071  Total loss: 312.862580599  Mean loss @ 1: 0.151068363
+poly_sym order 11 Time 37.25222897529602
+Train Data Eval:
+  Num examples: 2057  Total loss: 7882.711362726  Mean loss @ 1: 3.832139700
+Validate Data Eval:
+  Num examples: 2071  Total loss: 7927.425039534  Mean loss @ 1: 3.827824741
+poly_sym order 12 Time 53.64818215370178
+Train Data Eval:
+  Num examples: 2057  Total loss: 2497.743050726  Mean loss @ 1: 1.214264974
+Validate Data Eval:
+  Num examples: 2071  Total loss: 2572.632463081  Mean loss @ 1: 1.242217510
+poly_sym order 13 Time 73.3330910205841
+Train Data Eval:
+  Num examples: 2057  Total loss: 21127.450571484  Mean loss @ 1: 10.271001736
+Validate Data Eval:
+  Num examples: 2071  Total loss: 21580.216649270  Mean loss @ 1: 10.420191525
+poly_sym order 14 Time 85.38851594924927
+Train Data Eval:
+  Num examples: 2057  Total loss: 27059.774422834  Mean loss @ 1: 13.154970551
+Validate Data Eval:
+  Num examples: 2071  Total loss: 27300.668102476  Mean loss @ 1: 13.182360262
+poly_sym order 15 Time 229.71777248382568
+
+
+
+
+
+
+
+
+
