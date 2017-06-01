@@ -377,12 +377,14 @@ class PSF_interpolation:
 
             # Plot Residual Histogram
             plt.figure(figsize=(6, 6))
-            n, bins, patches = plt.hist(residual_color, 40, normed=1, facecolor='blue', alpha=0.75)
-            plt.xlabel('Ellipticity Residual')
+            n, bins, patches = plt.hist(color, 40, normed=1, facecolor='blue', alpha=0.75)
+            plt.xlabel('Ellipticity')
             plt.ylabel('Probability')
-            plt.title('{}'.format(method.title()))
+            # plt.title('{}'.format(method.title()))
+            plt.title('Validate Set Ellipticity')
             plt.grid(True)
             plt.show()
+            return
 
             # Plot Residual distribution
 
@@ -401,7 +403,7 @@ class PSF_interpolation:
             sm._A = []
             plt.colorbar(sm)
             plt.show()
-            return
+
 
 
             # Plot the distributions
